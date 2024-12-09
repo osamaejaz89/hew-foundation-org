@@ -1,0 +1,112 @@
+/* Container for the entire login page */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f2f5;
+    padding: 0 20px;
+  }
+  
+  /* Login Box */
+  .login-box {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  /* Title */
+  .login-box h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #333;
+  }
+  
+  /* Form input fields */
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s;
+  }
+  
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: #1976d2;
+    outline: none;
+  }
+  
+  /* Submit button */
+  button {
+    width: 100%;
+    padding: 15px;
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  button:hover {
+    background-color: #1565c0;
+  }
+  
+  /* Link to Register */
+  .login-box .link {
+    margin-top: 15px;
+    color: #1976d2;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  .login-box .link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .login-box {
+      padding: 30px;
+    }
+    
+    h2 {
+      font-size: 20px;
+    }
+    
+    input[type="email"],
+    input[type="password"],
+    button {
+      padding: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .login-box {
+      padding: 20px;
+      width: 100%;
+    }
+  
+    h2 {
+      font-size: 18px;
+    }
+  
+    input[type="email"],
+    input[type="password"],
+    button {
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+  

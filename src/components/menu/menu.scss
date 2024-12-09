@@ -1,0 +1,47 @@
+@import "../../styles/variables.scss";
+@import "../../styles/responsive.scss";
+
+.menu {
+  .item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    .title {
+      font-size: 12px;
+      font-weight: 200;
+      color: $soft-color;
+      text-transform: uppercase;
+
+      @include lg{
+        display: none;
+      }
+    }
+
+    .listItem {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+
+      &:hover {
+        background-color: $soft-bg;
+      }
+
+      .listItemTitle {
+        @include lg {
+          display: none;
+        }
+      }
+
+      &.selected {
+        background-color: $soft-bg;  // Keep the original background for hover effect
+        box-shadow: 0 0 0 2px #5f9eff;  // Light blue outline to indicate selection
+        color: #FFFF;  // Optional: Change text color to highlight the selected item
+      }
+    }
+  }
+}
