@@ -1,10 +1,9 @@
-import { Box, Button, Grid, Typography, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from "@mui/material";
+import { Box, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
 import { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import HorizontalCard from "../../pages/bloodDonars/horizontalCard";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import HorizontalCard from "./horizontalCard";
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // React Query hooks
+import { toast } from "react-toastify"; // React-Toastify
+import "react-toastify/dist/ReactToastify.css"; // Import CSS
 
 const bloodRequests = [
   {
@@ -41,37 +40,50 @@ const bloodRequests = [
 
 export default function BloodDonorRequest() {
   const [selectedDonor, setSelectedDonor] = useState<any>(null);
-  const queryClient = useQueryClient();
 
+  const queryClient = useQueryClient(); // For query invalidation or cache updates
+
+  // Approve Mutation
   const approveMutation = useMutation({
     mutationFn: async (donorId: number) => {
-      const response = await fetch(`/api/approve/${donorId}`, { method: "POST" });
-      if (!response.ok) throw new Error("Failed to approve the request");
+      const response = await fetch(`/api/approve/${donorId}`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to approve the request");
+      }
       return response.json();
     },
     onSuccess: () => {
       toast.success("Request Approved Successfully!");
-      queryClient.invalidateQueries(["donorRequests"]);
-      setSelectedDonor(null);
+      queryClient.invalidateQueries(["donorRequests"]); // Optional: Refresh donor requests
+      setSelectedDonor(false); // Close modal
     },
     onError: () => {
       toast.error("Failed to Approve the Request");
+      setSelectedDonor(false); // Close modal
     },
   });
 
+  // Reject Mutation
   const rejectMutation = useMutation({
     mutationFn: async (donorId: number) => {
-      const response = await fetch(`/api/reject/${donorId}`, { method: "POST" });
-      if (!response.ok) throw new Error("Failed to reject the request");
+      const response = await fetch(`/api/reject/${donorId}`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to reject the request");
+      }
       return response.json();
     },
     onSuccess: () => {
       toast.success("Request Rejected Successfully!");
-      queryClient.invalidateQueries(["donorRequests"]);
-      setSelectedDonor(null);
+      queryClient.invalidateQueries(["donorRequests"]); // Optional: Refresh donor requests
+      setSelectedDonor(false); // Close modal
     },
     onError: () => {
       toast.error("Failed to Reject the Request");
+      setSelectedDonor(false); // Close modal
     },
   });
 
@@ -93,21 +105,14 @@ export default function BloodDonorRequest() {
       {/* Dialog for Donor Details */}
       <Dialog
         open={!!selectedDonor}
-        onClose={() => setSelectedDonor(null)}
-        fullWidth
-        maxWidth="sm"
+        onClose={() => setSelectedDonor(false)}
+        aria-labelledby="donor-details-dialog"
+        aria-describedby="donor-details-description"
       >
-        <DialogTitle>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">Blood Donor Details</Typography>
-            <IconButton onClick={() => setSelectedDonor(null)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
+        <DialogTitle>Blood Donor Details</DialogTitle>
         <DialogContent>
           {selectedDonor && (
-            <>
+            <Box>
               <Typography variant="body1">
                 <strong>Name:</strong> {selectedDonor.name}
               </Typography>
@@ -129,7 +134,7 @@ export default function BloodDonorRequest() {
               <Typography variant="body1">
                 <strong>City:</strong> {selectedDonor.city}
               </Typography>
-            </>
+            </Box>
           )}
         </DialogContent>
         <DialogActions>

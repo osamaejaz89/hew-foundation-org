@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import AddModal from "../../components/add/Add";
-import "./Users.scss";
-import { userRows } from "../../data";
+import "./bloodDetails.scss";
+import { donarsRows } from "../../data";
 import { toast } from "react-toastify";
 
 const columns: GridColDef[] = [
@@ -17,74 +17,45 @@ const columns: GridColDef[] = [
     ),
   },
   {
-    field: "firstName",
-    type: "string",
-    headerName: "First Name",
+    field: "donarName",
+    headerName: "User Name",
     width: 150,
   },
-  {
-    field: "lastName",
-    type: "string",
-    headerName: "Last Name",
-    width: 150,
-  },
-  {
-    field: "email",
-    type: "string",
-    headerName: "Email",
-    width: 200,
-  },
-  {
-    field: "phone",
-    type: "string",
-    headerName: "Phone",
-    width: 200,
-  },
-  {
-    field: "createdAt",
-    headerName: "Created At",
-    width: 200,
-    type: "string",
-  },
-  {
-    field: "verified",
-    headerName: "Verified",
-    width: 150,
-    type: "boolean",
-  },
+  { field: "email", headerName: "Email", width: 200 },
+  { field: "phone", headerName: "Phone", width: 200 },
+  { field: "createdAt", headerName: "Created At", width: 200 },
+  { field: "userType", headerName: "User Type", width: 100 },
+  { field: "verified", headerName: "Verified", type: "boolean", width: 150 },
 ];
 
-const Users = () => {
+const BloodDetails = () => {
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<Record<string, any> | null>(null); // For editing
 
-  // Handle Delete User API
   const handleDeleteApi = async (id: number) => {
     try {
-      console.log(`Deleting user with ID: ${id}`);
-      toast.success(`Deleted user with ID: ${id}`);
+      console.log(`Deleting donor with ID: ${id}`);
+      toast.success(`Deleted donor with ID: ${id}`);
       // Replace with actual API call
     } catch (error) {
-      console.error("Error deleting user:", error);
-      toast.error("Error deleting user");
+      console.error("Error deleting donor:", error);
+      toast.error("Error deleting donor");
     }
   };
 
-  // Handle Add or Edit User Logic
   const handleAdd = (data: Record<string, any>) => {
     if (editData) {
-      console.log("Updated User Data: ", data);
-      toast.success("User updated successfully");
+      console.log("Updated Donor Data: ", data);
+      toast.success("Donor updated successfully");
       // Update logic (e.g., API call or state update)
     } else {
-      console.log("New User Data: ", data);
-      toast.success("User added successfully");
+      console.log("New Donor Data: ", data);
+      toast.success("Donor added successfully");
       // Add logic (e.g., API call or state update)
     }
     setEditData(null); // Clear edit data after submission
   };
 
-  // Handle Edit User
   const handleEdit = (row: Record<string, any>) => {
     setEditData(row); // Set the selected row data for editing
     setOpen(true); // Open the modal
@@ -93,13 +64,13 @@ const Users = () => {
   return (
     <div className="users">
       <div className="info">
-        <h1>Users</h1>
-        <button onClick={() => setOpen(true)}>Add New User</button>
+        <h1>Blood Details</h1>
+        <button onClick={() => setOpen(true)}>Add New Donar/Request</button>
       </div>
       <DataTable
-        slug="users"
+        slug="bloodDetails"
         columns={columns}
-        rows={userRows}
+        rows={donarsRows}
         handleDeleteApi={handleDeleteApi}
         handleEdit={handleEdit} // Pass edit handler
       />
@@ -110,13 +81,13 @@ const Users = () => {
           setEditData(null); // Reset editData on modal close
         }}
         onSubmit={handleAdd}
-        title={editData ? "Edit User" : "Add New User"}
+        title={editData ? "Edit Donor" : "Add New Donor"}
         columns={columns}
-        btnName={editData ? "Update User" : "Add User"}
+        btnName={editData ? "Update Donor" : "Add Donor"}
         initialData={editData || undefined} // Pass initial data for editing
       />
     </div>
   );
 };
 
-export default Users;
+export default BloodDetails;

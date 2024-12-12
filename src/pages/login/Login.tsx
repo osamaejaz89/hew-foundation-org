@@ -1,26 +1,31 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
+import { useLogin } from "./useLogin";
 import "./Login.scss";
 
 const Login = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const navigate = useNavigate();  // Initialize useNavigate
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { mutate, isLoading, error } = useLogin();
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Extract the error message from AxiosError if available
+  const errorMessage = (error: any | null) => {
+    return error?.response?.data?.message || "An error occurred during login.";
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Add your login logic here (e.g., authenticate the user)
-    console.log("Logged in with:", email, password);
-
-    // If login is successful, navigate to the home page
-    navigate("/");  // Navigate to the home page after login
+    try {
+      mutate({ email, password });
+    } catch (err) {
+      console.error("Login failed", err);
+    }
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
         <h2>Login</h2>
+        {error && <p className="error-message">{errorMessage(error)}</p>}
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -36,9 +41,10 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">Log In</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Log In"}
+          </button>
         </form>
-
       </div>
     </div>
   );
