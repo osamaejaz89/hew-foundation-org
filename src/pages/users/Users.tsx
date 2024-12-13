@@ -1,18 +1,11 @@
+import React, { useState } from "react";
 import { GridColDef } from "@mui/x-data-grid";
-<<<<<<< Updated upstream
 import DataTable from "../../components/dataTable/DataTable";
+import AddModal from "../../components/add/Add";
 import "./Users.scss";
 import { userRows } from "../../data";
 import { toast } from "react-toastify";
 import ReusableModal from "../../components/add/Add";
-=======
-import { useState } from "react";
-import { toast } from "react-toastify";
-import DataTable from "../../components/dataTable/DataTable";
-import ReusableModal from "../../components/ReusableModal/ReusableModal";
-import { userRows } from "../../data";
-import "./Users.scss";
->>>>>>> Stashed changes
 
 // const columns: GridColDef[] = [
 //   { field: "id", headerName: "ID", width: 90 },
@@ -72,6 +65,54 @@ const fieldConfig = [
   { name: "createdAt", label: "Created At", type: "text", width: 200 },
   { name: "verified", label: "Verified", type: "checkbox", width: 150 },
 ];
+
+// const columns: GridColDef[] = [
+//   { field: "id", headerName: "ID", width: 90 },
+//   {
+//     field: "img",
+//     headerName: "Avatar",
+//     width: 100,
+//     renderCell: (params) => (
+//       <img src={params.row.img || "/noavatar.png"} alt="" />
+//     ),
+//   },
+//   {
+//     field: "firstName",
+//     type: "string",
+//     headerName: "First Name",
+//     width: 150,
+//   },
+//   {
+//     field: "lastName",
+//     type: "string",
+//     headerName: "Last Name",
+//     width: 150,
+//   },
+//   {
+//     field: "email",
+//     type: "string",
+//     headerName: "Email",
+//     width: 200,
+//   },
+//   {
+//     field: "phone",
+//     type: "string",
+//     headerName: "Phone",
+//     width: 200,
+//   },
+//   {
+//     field: "createdAt",
+//     headerName: "Created At",
+//     width: 200,
+//     type: "string",
+//   },
+//   {
+//     field: "verified",
+//     headerName: "Verified",
+//     width: 150,
+//     type: "boolean",
+//   },
+// ];
 
 // Generate GridColDef from fieldConfig
 const columns: GridColDef[] = fieldConfig

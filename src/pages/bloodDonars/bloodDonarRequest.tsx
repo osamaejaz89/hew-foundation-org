@@ -1,4 +1,13 @@
-import { Box, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import HorizontalCard from "./horizontalCard";
 import { useMutation, useQueryClient } from "@tanstack/react-query"; // React Query hooks
@@ -94,17 +103,14 @@ export default function BloodDonorRequest() {
       </Typography>
 
       {/* Donor Cards Grid */}
-<<<<<<< Updated upstream
-      {/* <Grid container spacing={3}>
-=======
+
       <Grid container spacing={3}>
->>>>>>> Stashed changes
         {bloodDonarRequests.map((donor) => (
           <Grid item xs={12} sm={6} key={donor.id}>
             <HorizontalCard donor={donor} onViewDetails={setSelectedDonor} />
           </Grid>
         ))}
-      </Grid> */}
+      </Grid>
 
       {/* Dialog for Donor Details */}
       <Dialog
@@ -133,7 +139,8 @@ export default function BloodDonorRequest() {
                 <strong>Phone:</strong> {selectedDonor.phone}
               </Typography>
               <Typography variant="body1">
-                <strong>Hospital Address:</strong> {selectedDonor.hospitalAddress}
+                <strong>Hospital Address:</strong>{" "}
+                {selectedDonor.hospitalAddress}
               </Typography>
               <Typography variant="body1">
                 <strong>City:</strong> {selectedDonor.city}

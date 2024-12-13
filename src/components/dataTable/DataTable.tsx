@@ -78,10 +78,6 @@ const DataTable = (props: Props) => {
     setSelectedUserId(null);
   };
 
-<<<<<<< Updated upstream
-=======
- 
-
   // const actionColumn: GridColDef = {
   //   field: "action",
   //   headerName: "Action",
@@ -105,8 +101,6 @@ const DataTable = (props: Props) => {
   //     );
   //   },
   // };
-
->>>>>>> Stashed changes
   const actionColumn: GridColDef = {
     field: "action",
     headerName: "Action",

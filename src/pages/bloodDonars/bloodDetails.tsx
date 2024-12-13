@@ -1,12 +1,8 @@
-import React, { useState } from "react";
 import { GridColDef } from "@mui/x-data-grid";
-import DataTable from "../../components/dataTable/DataTable";
+import { useState } from "react";
 import { toast } from "react-toastify";
-<<<<<<< Updated upstream
 import ReusableModal from "../../components/add/Add";
-=======
-import ReusableModal from "../../components/ReusableModal/ReusableModal";
->>>>>>> Stashed changes
+import DataTable from "../../components/dataTable/DataTable";
 import { bloodListing } from "../../data";
 import "./bloodDetails.scss";
 
@@ -42,7 +38,7 @@ const fields = fieldConfig
 
 const BloodDetails = () => {
   const [open, setOpen] = useState(false);
-  const [editData, setEditData] = useState<Record<string, any> | null>(null);
+  const [editData, setEditData] = useState<Record<string, any> | null>(null); // For editing
 
   const handleDeleteApi = async (id: number) => {
     try {

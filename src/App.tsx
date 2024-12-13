@@ -89,7 +89,6 @@ function App() {
             </ProtectedRoute>
           ),
         },
-
         {
           path: "/users/:id",
           element: (
