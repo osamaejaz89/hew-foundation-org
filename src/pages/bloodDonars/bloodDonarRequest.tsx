@@ -94,7 +94,11 @@ export default function BloodDonorRequest() {
       </Typography>
 
       {/* Donor Cards Grid */}
+<<<<<<< Updated upstream
       {/* <Grid container spacing={3}>
+=======
+      <Grid container spacing={3}>
+>>>>>>> Stashed changes
         {bloodDonarRequests.map((donor) => (
           <Grid item xs={12} sm={6} key={donor.id}>
             <HorizontalCard donor={donor} onViewDetails={setSelectedDonor} />

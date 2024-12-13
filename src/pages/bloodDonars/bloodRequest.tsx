@@ -88,7 +88,7 @@ export default function BloodRequest() {
   return (
     <div style={{ padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
-        Blood Request Requests
+        Blood requests
       </Typography>
 
       {/* Donor Cards Grid */}

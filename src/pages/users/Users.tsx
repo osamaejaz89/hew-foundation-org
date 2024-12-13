@@ -1,10 +1,18 @@
-import React, { useState } from "react";
 import { GridColDef } from "@mui/x-data-grid";
+<<<<<<< Updated upstream
 import DataTable from "../../components/dataTable/DataTable";
 import "./Users.scss";
 import { userRows } from "../../data";
 import { toast } from "react-toastify";
 import ReusableModal from "../../components/add/Add";
+=======
+import { useState } from "react";
+import { toast } from "react-toastify";
+import DataTable from "../../components/dataTable/DataTable";
+import ReusableModal from "../../components/ReusableModal/ReusableModal";
+import { userRows } from "../../data";
+import "./Users.scss";
+>>>>>>> Stashed changes
 
 // const columns: GridColDef[] = [
 //   { field: "id", headerName: "ID", width: 90 },

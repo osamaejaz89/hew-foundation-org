@@ -78,6 +78,35 @@ const DataTable = (props: Props) => {
     setSelectedUserId(null);
   };
 
+<<<<<<< Updated upstream
+=======
+ 
+
+  // const actionColumn: GridColDef = {
+  //   field: "action",
+  //   headerName: "Action",
+  //   width: 250, // Increased width for Edit and Delete actions
+  //   renderCell: (params) => {
+  //     return (
+  //       <div className="action">
+  //         {/* <Link to={`/${props.slug}/${params.row.id}`}>
+  //           <img src="/view.svg" alt="View" />
+  //         </Link> */}
+  //         <div
+  //           className="edit"
+  //           onClick={() => props.handleEdit(params.row)} // Trigger edit handler
+  //         >
+  //           <img src="/view.svg" alt="View" />
+  //         </div>
+  //         <div className="delete" onClick={() => handleDelete(params.row.id)}>
+  //           <img src="/delete.svg" alt="Delete" />
+  //         </div>
+  //       </div>
+  //     );
+  //   },
+  // };
+
+>>>>>>> Stashed changes
   const actionColumn: GridColDef = {
     field: "action",
     headerName: "Action",

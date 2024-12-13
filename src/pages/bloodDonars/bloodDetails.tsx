@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import { toast } from "react-toastify";
+<<<<<<< Updated upstream
 import ReusableModal from "../../components/add/Add";
+=======
+import ReusableModal from "../../components/ReusableModal/ReusableModal";
+>>>>>>> Stashed changes
 import { bloodListing } from "../../data";
 import "./bloodDetails.scss";
 
@@ -96,6 +100,5 @@ const BloodDetails = () => {
       />
     </div>
   );
-};
-
+}
 export default BloodDetails;

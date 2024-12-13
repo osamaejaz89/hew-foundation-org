@@ -11,22 +11,22 @@ import Footer from "./components/footer/Footer";
 import Menu from "./components/menu/Menu";
 import Navbar from "./components/navbar/Navbar";
 import BloodDetails from "./pages/bloodDonars/bloodDetails";
-import BloodDonarRequest from "./pages/bloodDonars/bloodRequest";
+import BloodDonarRequest from "./pages/bloodDonars/bloodDonarRequest";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import Product from "./pages/product/Product";
-import Products from "./pages/products/Products";
 import User from "./pages/user/User";
 import Users from "./pages/users/Users";
 import "./styles/global.scss";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import BloodRequest from "./pages/bloodDonars/bloodRequest";
 
 const queryClient = new QueryClient();
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
-  console.log(isAuthenticated,'authhhh')
+  console.log(isAuthenticated, "authhhh");
   useEffect(() => {
     // Check for token on initial load
     const token = localStorage.getItem("authToken");
@@ -89,14 +89,7 @@ function App() {
             </ProtectedRoute>
           ),
         },
-        {
-          path: "/products",
-          element: (
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          ),
-        },
+
         {
           path: "/users/:id",
           element: (
@@ -117,7 +110,7 @@ function App() {
           path: "/bloodRequest",
           element: (
             <ProtectedRoute>
-              <BloodDonarRequest />
+              <BloodRequest />
             </ProtectedRoute>
           ),
         },
