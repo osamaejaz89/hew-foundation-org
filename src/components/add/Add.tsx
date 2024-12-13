@@ -1,73 +1,135 @@
-import { GridColDef } from "@mui/x-data-grid";
-import "./add.scss";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Grid,
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  IconButton,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
 
-type Props = {
-  slug: string;
-  btnName:any;
-  columns: GridColDef[];
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (data: Record<string, any>) => void;
+  title: string;
+  initialData?: Record<string, any>;
+  fields: { name: string; label: string; type: string; options?: string[] }[]; // Add `options` for radio inputs
+}
 
-const Add = (props: Props) => {
+const ReusableModal: React.FC<ModalProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  title,
+  initialData = {},
+  fields,
+}) => {
+  const [formData, setFormData] = useState<Record<string, any>>(initialData);
 
-  // TEST THE API
+  console.log(fields,'fiedlssss');
 
-  // const queryClient = useQueryClient();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // const mutation = useMutation({
-  //   mutationFn: () => {
-  //     return fetch(`http://localhost:8800/api/${props.slug}s`, {
-  //       method: "post",
-  //       headers: {
-  //         Accept: "application/json",
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         id: 111,
-  //         img: "",
-  //         lastName: "Hello",
-  //         firstName: "Test",
-  //         email: "testme@gmail.com",
-  //         phone: "123 456 789",
-  //         createdAt: "01.02.2023",
-  //         verified: true,
-  //       }),
-  //     });
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries([`all${props.slug}s`]);
-  //   },
-  // });
+  useEffect(() => {
+    setFormData(initialData);
+  }, [initialData]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldType?: string
+  ) => {
+    const { name, value, checked } = e.target;
 
-    //add new item
-    // mutation.mutate();
-    props.setOpen(false)
+    setFormData((prev) => ({
+      ...prev,
+      [name]: fieldType === "checkbox" ? checked : value,
+    }));
   };
+
+  const handleSubmit = () => {
+    onSubmit(formData);
+    onClose();
+  };
+
   return (
-    <div className="add">
-      <div className="modal">
-        <span className="close" onClick={() => props.setOpen(false)}>
-          X
-        </span>
-        <h1>Add new {props.slug}</h1>
-        <form onSubmit={handleSubmit}>
-          {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "img")
-            .map((column) => (
-              <div className="item">
-                <label>{column.headerName}</label>
-                <input type={column.type} placeholder={column.field} />
-              </div>
-            ))}
-          <button>{props.btnName ?? 'Add'}</button>
-        </form>
-      </div>
-    </div>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogContent dividers sx={{ px: 3, py: 2 }}>
+        <Grid container spacing={isSmallScreen ? 2 : 3}>
+          {fields.map((field) => (
+            <Grid item xs={12} sm={6} key={field.name}>
+              {field.type === "checkbox" ? (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name={field.name}
+                      checked={!!formData[field.name]}
+                      onChange={(e) => handleChange(e, "checkbox")}
+                    />
+                  }
+                  label={field.label}
+                />
+              ) : field.type === "radio" ? (
+                <RadioGroup
+                  name={field.name}
+                  value={formData[field.name] || ""}
+                  onChange={handleChange}
+                >
+                  {field.options?.map((option) => (
+                    <FormControlLabel
+                      key={option}
+                      value={option}
+                      control={<Radio />}
+                      label={option}
+                    />
+                  ))}
+                </RadioGroup>
+              ) : (
+                <TextField
+                  fullWidth
+                  name={field.name}
+                  label={field.label}
+                  type={field.type}
+                  value={formData[field.name] || ""}
+                  onChange={handleChange}
+                  multiline={field.type === "textarea"}
+                  rows={field.type === "textarea" ? 4 : 1}
+                />
+              )}
+            </Grid>
+          ))}
+        </Grid>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button
+          onClick={onClose}
+          color="secondary"
+          variant="outlined"
+          sx={{ textTransform: "none" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          color="primary"
+          variant="contained"
+          sx={{ textTransform: "none" }}
+        >
+          Submit
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
-export default Add;
+export default ReusableModal;

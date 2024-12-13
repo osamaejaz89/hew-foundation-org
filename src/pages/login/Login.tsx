@@ -1,26 +1,27 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
+import { useLogin } from "./useLogin";
+import CircularProgress from "@mui/material/CircularProgress";
 import "./Login.scss";
 
 const Login = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const navigate = useNavigate();  // Initialize useNavigate
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { mutate, isLoading, error } = useLogin();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const errorMessage = (error: any | null) => {
+    return error?.message || "An error occurred during login.";
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Add your login logic here (e.g., authenticate the user)
-    console.log("Logged in with:", email, password);
-
-    // If login is successful, navigate to the home page
-    navigate("/");  // Navigate to the home page after login
+    mutate({ email, password });
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
         <h2>Login</h2>
+        
         <form onSubmit={handleLogin}>
           <input
             type="email"
@@ -36,9 +37,15 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">Log In</button>
+          {error && <p className="error-message">{errorMessage(error)}</p>}
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <CircularProgress size={20} style={{ color: "#fff" }} />
+            ) : (
+              "Log In"
+            )}
+          </button>
         </form>
-
       </div>
     </div>
   );

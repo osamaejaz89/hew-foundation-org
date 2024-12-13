@@ -1,6 +1,8 @@
 @import "../../styles/variables.scss";
 @import "../../styles/responsive.scss";
-
+$hover-bg: #f0f0f0; // Set the desired hover background color
+ $soft-color: #555; // Adjust this if needed
+ $soft-bg: #eaeaea; // Adjust this if needed
 .menu {
   .item {
     display: flex;
@@ -11,10 +13,10 @@
     .title {
       font-size: 12px;
       font-weight: 200;
-      color: $soft-color;
+      color: "#5555";
       text-transform: uppercase;
 
-      @include lg{
+      @include lg {
         display: none;
       }
     }
@@ -25,10 +27,9 @@
       gap: 10px;
       padding: 10px;
       border-radius: 5px;
-      transition: background-color 0.3s, box-shadow 0.3s;
-
+      cursor: pointer;
       &:hover {
-        background-color: $soft-bg;
+        background-color: #f7eaeacc,
       }
 
       .listItemTitle {
@@ -36,11 +37,30 @@
           display: none;
         }
       }
+    }
+    
 
-      &.selected {
-        background-color: $soft-bg;  // Keep the original background for hover effect
-        box-shadow: 0 0 0 2px #5f9eff;  // Light blue outline to indicate selection
-        color: #FFFF;  // Optional: Change text color to highlight the selected item
+    // Dropdown styles
+    &.dropdown {
+      position: relative;
+
+      .dropdownContent {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 100%;
+        background-color: $soft-bg;
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+      }
+
+      &:hover {
+        .dropdownContent {
+          display: block; // Show dropdown on hover
+        }
       }
     }
   }
