@@ -2,44 +2,66 @@
 
 .navbar {
   width: 100%;
-  padding: 20px;
+  padding: 15px 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   .logo {
     display: flex;
     align-items: center;
-    font-weight: bold;
-    gap: 10px;
+    gap: 12px;
+    
+    img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    span {
+      font-size: 20px;
+      font-weight: 500;
+      color: white;
+    }
   }
+
   .icons {
     display: flex;
     align-items: center;
     gap: 20px;
 
-    .icon{
-      @include sm{
-        display: none;
-      }
-    }
-
     .notification {
       position: relative;
+      cursor: pointer;
+      
+      img {
+        width: 24px;
+        height: 24px;
+        opacity: 0.8;
+        transition: opacity 0.3s;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
 
       span {
-        background-color: red;
+        background-color: #e91e63;
         color: white;
         width: 16px;
         height: 16px;
         border-radius: 50%;
         position: absolute;
-        top: -10px;
-        right: -10px;
+        top: -6px;
+        right: -6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
+        font-size: 10px;
+        font-weight: 500;
       }
     }
 
@@ -47,12 +69,52 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
 
       img {
-        width: 26px;
-        height: 26px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
         object-fit: cover;
+      }
+
+      .info {
+        display: flex;
+        flex-direction: column;
+        
+        .username {
+          font-size: 14px;
+          font-weight: 500;
+          color: white;
+        }
+
+        .role {
+          font-size: 12px;
+          color: #b7bac1;
+        }
+      }
+    }
+
+    .logout {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(233, 30, 99, 0.1);
+      color: #e91e63;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(233, 30, 99, 0.2);
+
+      &:hover {
+        background: rgba(233, 30, 99, 0.2);
       }
     }
   }

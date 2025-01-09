@@ -6,7 +6,7 @@ export const menu = [
       {
         id: 1,
         title: "Homepage",
-        url: "/",
+        url: "/home",
         icon: "home.svg",
       },
     ],
@@ -24,7 +24,6 @@ export const menu = [
       {
         id: 2,
         title: "Blood Donors / Request",
-        // url: "/bloodDonors",
         icon: "user.svg",
         nestedItems: [
           {
@@ -37,9 +36,8 @@ export const menu = [
             id: 2,
             title: "Blood Donors Request",
             url: "/bloodDonarRequest",
-            icon: "approval.svg",
+            icon: "user.svg",
           },
-         
           {
             id: 3,
             title: "Blood Request",

@@ -1,184 +1,137 @@
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
-import ConfirmationModal from "../confirmationModal/confirmationModal";
+import SearchIcon from '@mui/icons-material/Search';
 import "./dataTable.scss";
 
-type Props = {
+interface Props {
   columns: GridColDef[];
-  rows: object[];
+  rows: any[];
   slug: string;
   handleDeleteApi: (id: number) => Promise<void>;
-  handleEdit: (row: object) => void;
-};
-
-const CustomSearchBox = ({
-  onSearch,
-}: {
-  onSearch: (query: string) => void;
-}) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onSearch(event.target.value);
-  };
-
-  return (
-    <div className="customSearchBox">
-      <input
-        type="text"
-        placeholder="Search..."
-        onChange={handleChange}
-        style={{
-          backgroundColor: "#fff",
-          padding: "5px 15px",
-          fontSize: "14px",
-          borderRadius: "0px",
-          border: "1px solid #ccc",
-          color: "#000",
-          width: "200px", // Set width of the search box
-        }}
-      />
-    </div>
-  );
-};
+  handleEdit: (row: Record<string, any>) => void;
+  loading?: boolean;
+  getRowId?: (row: any) => string | number;
+}
 
 const DataTable = (props: Props) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState("");
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter rows based on the search query
-  const filteredRows = props.rows.filter((row) => {
-    return Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-
-  const handleDelete = (id: number) => {
-    setSelectedUserId(id);
-    setModalContent(`Are you sure you want to delete User ID: ${id}?`);
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (selectedUserId !== null) {
-      try {
-        await props.handleDeleteApi(selectedUserId);
-        console.log(`Deleted user with ID: ${selectedUserId}`);
-      } catch (error) {
-        console.error("Error deleting user:", error);
-      } finally {
-        setIsModalOpen(false);
-        setSelectedUserId(null);
-      }
-    }
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedUserId(null);
-  };
-
-  // const actionColumn: GridColDef = {
-  //   field: "action",
-  //   headerName: "Action",
-  //   width: 250, // Increased width for Edit and Delete actions
-  //   renderCell: (params) => {
-  //     return (
-  //       <div className="action">
-  //         {/* <Link to={`/${props.slug}/${params.row.id}`}>
-  //           <img src="/view.svg" alt="View" />
-  //         </Link> */}
-  //         <div
-  //           className="edit"
-  //           onClick={() => props.handleEdit(params.row)} // Trigger edit handler
-  //         >
-  //           <img src="/view.svg" alt="View" />
-  //         </div>
-  //         <div className="delete" onClick={() => handleDelete(params.row.id)}>
-  //           <img src="/delete.svg" alt="Delete" />
-  //         </div>
-  //       </div>
-  //     );
-  //   },
-  // };
-  const actionColumn: GridColDef = {
-    field: "action",
-    headerName: "Action",
-    width: 250,
-    renderCell: (params) => {
-      return (
-        <div className="action">
-          <div className="edit" onClick={() => props.handleEdit(params.row)}>
-            <img src="/view.svg" alt="View" />
-          </div>
-          <div className="delete" onClick={() => handleDelete(params.row.id)}>
-            <img src="/delete.svg" alt="Delete" />
-          </div>
-        </div>
-      );
-    },
-  };
+  // Filter rows based on search query
+  const filteredRows = props.rows.filter((row) =>
+    Object.values(row).some((value) =>
+      value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   return (
-    <div className="dataTable">
-      {/* Custom Search Box */}
-      <CustomSearchBox onSearch={setSearchQuery} />
+    <div className="data-table-container">
+      <div className="table-header">
+        <div className="search-box">
+          <SearchIcon className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search..."
+            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+          />
+        </div>
+      </div>
 
       <DataGrid
-        className="dataGrid"
+        className="data-grid"
         rows={filteredRows}
-        columns={[...props.columns, actionColumn]}
+        columns={props.columns}
+        getRowId={props.getRowId}
         initialState={{
           pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
+            paginationModel: { pageSize: 10, page: 0 },
+          },
+          sorting: {
+            sortModel: [{ field: 'verified', sort: 'asc' }],
           },
         }}
-        pageSizeOptions={[5]}
-        checkboxSelection
+        pageSizeOptions={[5, 10, 25]}
+        loading={props.loading}
+        autoHeight
         disableRowSelectionOnClick
         disableColumnFilter
         disableDensitySelector
         disableColumnSelector
         sx={{
-          "& .MuiDataGrid-footerContainer": {
-            width: "100%", // Full width
-            paddingRight: "40px", // Right
-            overflow: "hidden", // Hide overflow
+          '& .MuiDataGrid-root': {
+            border: 'none',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           },
-          "& .MuiDataGrid-footer": {
-            color: "#000", // Footer text color
+          '& .MuiDataGrid-cell': {
+            borderBottom: '1px solid #f0f0f0',
+            padding: '12px 16px',
           },
-
-          ".MuiTablePagination-actions": {
-            color: "blue", // Change arrow
-            display: "flex",
-            overflow: "hidden",
-            flexDirection: "row",
-            paddingRight: 10,
+          '& .MuiDataGrid-columnHeaders': {
+            backgroundColor: '#f8f9fa',
+            borderBottom: '2px solid #e9ecef',
+            borderRadius: '8px 8px 0 0',
           },
-          ".MuiTablePagination-actions button": {
-            borderRadius: "50%", // Round buttons
-            backgroundColor: "#ffff", // Background color
-            "&:hover": {
-              backgroundColor: "#d3d3d3", // Hover effect
+          '& .MuiDataGrid-columnHeader': {
+            padding: '16px',
+          },
+          '& .MuiDataGrid-columnHeaderTitle': {
+            fontWeight: 600,
+          },
+          '& .MuiDataGrid-footerContainer': {
+            borderTop: '1px solid #e0e0e0',
+            backgroundColor: '#fff',
+            padding: '10px 0',
+          },
+          '& .MuiTablePagination-root': {
+            color: '#333',
+          },
+          '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+            margin: 0,
+          },
+          '& .MuiTablePagination-select': {
+            padding: '0 8px',
+          },
+          '& .MuiTablePagination-actions': {
+            marginLeft: '20px',
+            '& button': {
+              padding: '4px',
+              borderRadius: '4px',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              },
+              '&.Mui-disabled': {
+                opacity: 0.3,
+              },
             },
           },
-          ".MuiSvgIcon-root": {
-            fontSize: "1.5rem", // Increase arrow size
+          '& .MuiSelect-select': {
+            backgroundColor: '#fff',
+            borderRadius: '4px',
+            padding: '4px 32px 4px 8px !important',
+            '&:focus': {
+              backgroundColor: '#fff',
+            },
+          },
+          '& .MuiTablePagination-toolbar': {
+            minHeight: '52px',
+            alignItems: 'center',
+            '& > *': {
+              flex: 'none',
+            },
+          },
+          '& .MuiDataGrid-row:hover': {
+            backgroundColor: '#f8f9fa',
+          },
+          '& .MuiDataGrid-row.Mui-selected': {
+            backgroundColor: '#e3f2fd',
+            '&:hover': {
+              backgroundColor: '#e3f2fd',
+            },
           },
         }}
       />
-
-      {isModalOpen && (
-        <ConfirmationModal
-          open={isModalOpen}
-          message={modalContent}
-          onConfirm={handleDeleteConfirm}
-          onCancel={handleModalClose}
-        />
-      )}
     </div>
   );
 };

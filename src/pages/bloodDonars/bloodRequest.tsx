@@ -1,9 +1,21 @@
-import { Box, Button, Grid, Modal, Typography } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Modal,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import HorizontalCard from "./horizontalCard";
 import { useMutation, useQueryClient } from "@tanstack/react-query"; // React Query hooks
 import { toast } from "react-toastify"; // React-Toastify
 import "react-toastify/dist/ReactToastify.css"; // Import CSS
+import { getBloodRequest, useApproveRejectBloodRequest } from "./useBloodApi";
+import { useLocation } from "react-router-dom";
 
 const donorRequests = [
   {
@@ -43,47 +55,60 @@ export default function BloodRequest() {
 
   const queryClient = useQueryClient(); // For query invalidation or cache updates
 
-  // Approve Mutation
-  const approveMutation = useMutation({
-    mutationFn: async (donorId: number) => {
-      const response = await fetch(`/api/approve/${donorId}`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to approve the request");
+  const approveRejectMutation = useApproveRejectBloodRequest(
+    selectedDonor?._id
+  );
+  const handleApproval = (isApproved: boolean) => {
+    approveRejectMutation.mutate(
+      {
+        isApproved,
+        adminRemarks: isApproved ? "Approved by admin" : "Rejected by admin",
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            isApproved
+              ? "Request Approved Successfully!"
+              : "Request Rejected Successfully!"
+          );
+          setSelectedDonor(null); // Close modal
+          queryClient.invalidateQueries(["blood-requests/requests"]);
+        },
+        onError: () => {
+          toast.error(
+            isApproved
+              ? "Failed to Approve the Request"
+              : "Failed to Reject the Request"
+          );
+        },
       }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast.success("Request Approved Successfully!");
-      setSelectedDonor(null); // Close modal
-      queryClient.invalidateQueries(["donorRequests"]); // Optional: Refresh donor requests
-    },
-    onError: () => {
-      toast.error("Failed to Approve the Request");
-    },
+    );
+  };
+
+  // const {
+  //   data: bloodRequestsData,
+  //   isLoading,
+  //   isError,
+  //   error,
+  // } = getBloodRequest();
+  const {
+    data: bloodRequestsData = [], // Default to an empty array if no data
+    isLoading,
+    isError,
+    error,
+  } = getBloodRequest({
+    refetchInterval: 15000, // Poll for updates every 15 seconds
+    refetchOnWindowFocus: true, // Refetch on window focus
   });
 
-  // Reject Mutation
-  const rejectMutation = useMutation({
-    mutationFn: async (donorId: number) => {
-      const response = await fetch(`/api/reject/${donorId}`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to reject the request");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast.success("Request Rejected Successfully!");
-      setSelectedDonor(null); // Close modal
-      queryClient.invalidateQueries(["donorRequests"]); // Optional: Refresh donor requests
-    },
-    onError: () => {
-      toast.error("Failed to Reject the Request");
-    },
-  });
+  // console.table("bloodRequestsData", bloodRequestsData);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error?.message}</div>;
+
+  const location = useLocation();
+  const path = location.pathname.toString();
+  const checkPagePath = path === "/bloodRequest";
 
   return (
     <div style={{ padding: "20px" }}>
@@ -93,80 +118,209 @@ export default function BloodRequest() {
 
       {/* Donor Cards Grid */}
       <Grid container spacing={3}>
-        {donorRequests.map((donor) => (
+        {bloodRequestsData.map((donor: any) => (
           <Grid item xs={12} sm={6} key={donor.id}>
-            <HorizontalCard donor={donor} onViewDetails={setSelectedDonor} />
+            <HorizontalCard
+              donor={donor}
+              onViewDetails={setSelectedDonor}
+              currentPagePath={path}
+            />
           </Grid>
         ))}
       </Grid>
 
       {/* Modal for Donor Details */}
-      {selectedDonor && (
-        <Modal
-          open={!!selectedDonor}
-          onClose={() => setSelectedDonor(null)}
-          aria-labelledby="donor-details-modal"
-          aria-describedby="donor-details-description"
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 400,
-              bgcolor: "background.paper",
-              borderRadius: 2,
-              boxShadow: 24,
-              p: 4,
-            }}
+      <Dialog
+        open={!!selectedDonor}
+        onClose={() => setSelectedDonor(null)}
+        aria-labelledby="donor-details-dialog"
+        aria-describedby="donor-details-description"
+        maxWidth="md" // Change to "lg" or a custom value for larger sizes
+        fullWidth // Ensures the dialog uses the full width of the screen up to the maxWidth
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "40%", // You can adjust this percentage or use specific pixel values
+            height: "70%", // You can adjust this value
+            maxWidth: "none", // Disable default maxWidth constraints
+            padding: "20px", // Add padding to the dialog content
+          },
+        }}
+      >
+        <DialogContent>
+          {selectedDonor && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Blood Request Details
+              </Typography>
+
+              <Typography variant="body1">
+                <strong>Contact person:</strong>
+                {checkPagePath
+                  ? selectedDonor?.contactPerson
+                  : selectedDonor.name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Patient Name:</strong>{" "}
+                {checkPagePath
+                  ? selectedDonor?.patientName
+                  : selectedDonor.name}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Blood Group:</strong> {selectedDonor.bloodGroup}
+              </Typography>
+              <Typography variant="body1">
+                {/* <strong>Required Date:</strong> {selectedDonor.requiredDate} */}
+                <strong>Required Date:</strong>{" "}
+                {new Date(
+                  checkPagePath
+                    ? selectedDonor?.requiredDate
+                    : selectedDonor.dateOfDonation
+                ).toLocaleDateString()}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Email:</strong> {selectedDonor?.donor?.email}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Phone:</strong> {selectedDonor?.donor?.phone}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Hospital Address:</strong> {selectedDonor.hospital}
+              </Typography>
+              <Typography variant="body1">
+                <strong>City:</strong> {selectedDonor?.location}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Status:</strong>{" "}
+                <Typography
+                  component="span"
+                  sx={{
+                    color:
+                      selectedDonor?.status === "Approved"
+                        ? "success.main"
+                        : selectedDonor?.status === "Pending"
+                        ? "main.secondary"
+                        : "error.main",
+                  }}
+                >
+                  {selectedDonor.status}
+                </Typography>
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions style={{ justifyContent: "center", padding: "20px" }}>
+          <Button
+            variant="contained"
+            sx={{ mr: 2, width: "40%" }}
+            color="success"
+            onClick={() => handleApproval(true)}
+            disabled={approveRejectMutation.isLoading}
           >
-            <Typography variant="h6" gutterBottom>
-              Blood Request Details
-            </Typography>
-            <Typography variant="body1">
-              <strong>Name:</strong> {selectedDonor.name}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Blood Group:</strong> {selectedDonor.bloodGroup}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Required Date:</strong> {selectedDonor.requiredDate}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Email:</strong> {selectedDonor.email}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Phone:</strong> {selectedDonor.phone}
-            </Typography>
-            <Typography variant="body1">
-              <strong>Hospital Address:</strong> {selectedDonor.hospitalAddress}
-            </Typography>
-            <Typography variant="body1">
-              <strong>City:</strong> {selectedDonor.city}
-            </Typography>
-            <div style={{ marginTop: "20px" }}>
-              <Button
-                variant="contained"
-                color="success"
-                sx={{ mr: 2 }}
-                onClick={() => approveMutation.mutate(selectedDonor.id)}
-                disabled={approveMutation.isLoading}
-              >
-                {approveMutation.isLoading ? "Approving..." : "Approve"}
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => rejectMutation.mutate(selectedDonor.id)}
-                disabled={rejectMutation.isLoading}
-              >
-                {rejectMutation.isLoading ? "Rejecting..." : "Reject"}
-              </Button>
-            </div>
-          </Box>
-        </Modal>
-      )}
+            {approveRejectMutation.isLoading &&
+            approveRejectMutation.variables?.isApproved
+              ? "Approving..."
+              : "Approve"}
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ ml: 2, width: "40%" }}
+            color="error"
+            onClick={() => handleApproval(false)}
+            disabled={approveRejectMutation.isLoading}
+          >
+            {approveRejectMutation.isLoading &&
+            !approveRejectMutation.variables?.isApproved
+              ? "Rejecting..."
+              : "Reject"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
+
+// {selectedDonor && (
+//   <Modal
+//     open={!!selectedDonor}
+//     onClose={() => setSelectedDonor(null)}
+//     aria-labelledby="donor-details-modal"
+//     aria-describedby="donor-details-description"
+//   >
+//     <Box
+//       sx={{
+//         position: "absolute",
+//         top: "50%",
+//         left: "50%",
+//         transform: "translate(-50%, -50%)",
+//         width: 400,
+//         bgcolor: "background.paper",
+//         borderRadius: 2,
+//         boxShadow: 24,
+//         p: 4,
+//       }}
+//     >
+//       <Typography variant="h6" gutterBottom>
+//         Blood Request Details
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>Contact person:</strong>{" "}
+//         {checkPagePath
+//           ? selectedDonor?.contactPerson
+//           : selectedDonor.name}
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>Patient Name:</strong>{" "}
+//         {checkPagePath ? selectedDonor?.patientName : selectedDonor.name}
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>Blood Group:</strong> {selectedDonor.bloodGroup}
+//       </Typography>
+//       <Typography variant="body1">
+//         {/* <strong>Required Date:</strong> {selectedDonor.requiredDate} */}
+//         <strong>Required Date:</strong>{" "}
+//         {new Date(
+//           checkPagePath
+//             ? selectedDonor?.requiredDate
+//             : selectedDonor.dateOfDonation
+//         ).toLocaleDateString()}
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>Email:</strong> {selectedDonor?.donor?.email}
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>Phone:</strong> {selectedDonor?.donor?.phone}
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>Hospital Address:</strong> {selectedDonor.hospital}
+//       </Typography>
+//       <Typography variant="body1">
+//         <strong>City:</strong> {selectedDonor?.location}
+//       </Typography>
+//       <div style={{ marginTop: "20px" }}>
+//         <Button
+//           variant="contained"
+//           color="success"
+//           sx={{ mr: 2 }}
+//           onClick={() => handleApproval(true)}
+//           disabled={approveRejectMutation.isLoading}
+//         >
+//           {approveRejectMutation.isLoading &&
+//           approveRejectMutation.variables?.isApproved
+//             ? "Approving..."
+//             : "Approve"}
+//         </Button>
+//         <Button
+//           variant="contained"
+//           color="error"
+//           onClick={() => handleApproval(false)}
+//           disabled={approveRejectMutation.isLoading}
+//         >
+//           {approveRejectMutation.isLoading &&
+//           !approveRejectMutation.variables?.isApproved
+//             ? "Rejecting..."
+//             : "Reject"}
+//         </Button>
+//       </div>
+//     </Box>
+//   </Modal>
+// )}

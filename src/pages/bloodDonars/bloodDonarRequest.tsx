@@ -10,160 +10,167 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import HorizontalCard from "./horizontalCard";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // React Query hooks
-import { toast } from "react-toastify"; // React-Toastify
-import "react-toastify/dist/ReactToastify.css"; // Import CSS
-
-const bloodDonarRequests = [
-  {
-    id: 1,
-    name: "John Doe",
-    bloodGroup: "O+",
-    requiredDate: "2024-12-15",
-    email: "john@example.com",
-    phone: "123-456-7890",
-    hospitalAddress: "City Hospital, Street 10",
-    city: "New York",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    bloodGroup: "A-",
-    requiredDate: "2024-12-20",
-    email: "jane@example.com",
-    phone: "987-654-3210",
-    hospitalAddress: "Care Medical, Main Avenue",
-    city: "Los Angeles",
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    bloodGroup: "B+",
-    requiredDate: "2024-12-18",
-    email: "michael@example.com",
-    phone: "555-123-4567",
-    hospitalAddress: "Saint Mary's Hospital",
-    city: "Chicago",
-  },
-];
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getBloodDonar, useApprovedRejectBloodDonor } from "./useBloodApi";
 
 export default function BloodDonorRequest() {
   const [selectedDonor, setSelectedDonor] = useState<any>(null);
+  const queryClient = useQueryClient();
 
-  const queryClient = useQueryClient(); // For query invalidation or cache updates
-
-  // Approve Mutation
-  const approveMutation = useMutation({
-    mutationFn: async (donorId: number) => {
-      const response = await fetch(`/api/approve/${donorId}`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to approve the request");
+  const approveRejectMutation = useApprovedRejectBloodDonor(selectedDonor?._id);
+  const handleApproval = (isApproved: boolean) => {
+    approveRejectMutation.mutate(
+      {
+        isApproved,
+        adminRemarks: isApproved ? "Approved by admin" : "Rejected by admin",
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            isApproved
+              ? "Request Approved Successfully!"
+              : "Request Rejected Successfully!"
+          );
+          setSelectedDonor(null); // Close modal
+          queryClient.invalidateQueries(["blood/donor-request/"]); // Refresh blood requests
+        },
+        onError: () => {
+          toast.error(
+            isApproved
+              ? "Failed to Approve the Request"
+              : "Failed to Reject the Request"
+          );
+        },
       }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast.success("Request Approved Successfully!");
-      queryClient.invalidateQueries(["donorRequests"]); // Optional: Refresh donor requests
-      setSelectedDonor(false); // Close modal
-    },
-    onError: () => {
-      toast.error("Failed to Approve the Request");
-      setSelectedDonor(false); // Close modal
-    },
+    );
+  };
+
+  const {
+    data: donarRequestsData,
+    isLoading,
+    isError,
+    error,
+  } = getBloodDonar({
+    refetchOnWindowFocus: true,
+    refetchInterval: 15000,
+    staleTime: 1000,
+    cacheTime: 300000,
   });
 
-  // Reject Mutation
-  const rejectMutation = useMutation({
-    mutationFn: async (donorId: number) => {
-      const response = await fetch(`/api/reject/${donorId}`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to reject the request");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast.success("Request Rejected Successfully!");
-      queryClient.invalidateQueries(["donorRequests"]); // Optional: Refresh donor requests
-      setSelectedDonor(false); // Close modal
-    },
-    onError: () => {
-      toast.error("Failed to Reject the Request");
-      setSelectedDonor(false); // Close modal
-    },
-  });
+  if (isLoading) return <div>Loading...</div>;
+  if (isError || !donarRequestsData)
+    return <div>Error: {error?.message || "Failed to fetch data"}</div>;
+
+  const donorRequests = donarRequestsData?.bloodDonorRequests || [];
+  console.log("donorRequests", donorRequests);
 
   return (
     <div style={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
+      {/* <Typography variant="h4" gutterBottom>
         Blood Donor Requests
-      </Typography>
+      </Typography> */}
 
       {/* Donor Cards Grid */}
-
       <Grid container spacing={3}>
-        {bloodDonarRequests.map((donor) => (
-          <Grid item xs={12} sm={6} key={donor.id}>
-            <HorizontalCard donor={donor} onViewDetails={setSelectedDonor} />
-          </Grid>
-        ))}
+        {donorRequests.length > 0 ? (
+          donorRequests.map((donor: any) => (
+            <Grid item xs={12} sm={6} key={donor._id}>
+              <HorizontalCard donor={donor} onViewDetails={setSelectedDonor} />
+            </Grid>
+          ))
+        ) : (
+          <Typography
+            variant="body1"
+            style={{ textAlign: "center", width: "100%" }}
+          >
+            No data available
+          </Typography>
+        )}
       </Grid>
 
       {/* Dialog for Donor Details */}
       <Dialog
         open={!!selectedDonor}
-        onClose={() => setSelectedDonor(false)}
+        onClose={() => setSelectedDonor(null)}
         aria-labelledby="donor-details-dialog"
         aria-describedby="donor-details-description"
+        maxWidth="md" // Change to "lg" or a custom value for larger sizes
+        fullWidth // Ensures the dialog uses the full width of the screen up to the maxWidth
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "40%", // You can adjust this percentage or use specific pixel values
+            height: "70%", // You can adjust this value
+            maxWidth: "none", // Disable default maxWidth constraints
+            padding: "20px", // Add padding to the dialog content
+          },
+        }}
       >
         <DialogTitle>Blood Donor Details</DialogTitle>
         <DialogContent>
           {selectedDonor && (
             <Box>
               <Typography variant="body1">
-                <strong>Name:</strong> {selectedDonor.name}
+                <strong>Name:</strong> {selectedDonor.fullName}
               </Typography>
               <Typography variant="body1">
                 <strong>Blood Group:</strong> {selectedDonor.bloodGroup}
               </Typography>
               <Typography variant="body1">
-                <strong>Required Date:</strong> {selectedDonor.requiredDate}
+                <strong>Gender:</strong> {selectedDonor.gender}
               </Typography>
               <Typography variant="body1">
-                <strong>Email:</strong> {selectedDonor.email}
+                <strong>Age:</strong> {selectedDonor.age}
               </Typography>
               <Typography variant="body1">
-                <strong>Phone:</strong> {selectedDonor.phone}
+                <strong>Last Donation Date:</strong>{" "}
+                {new Date(selectedDonor.lastDonationDate).toLocaleDateString()}
               </Typography>
               <Typography variant="body1">
-                <strong>Hospital Address:</strong>{" "}
-                {selectedDonor.hospitalAddress}
+                <strong>Medical Conditions:</strong>{" "}
+                {selectedDonor.medicalConditions || "None"}
               </Typography>
               <Typography variant="body1">
-                <strong>City:</strong> {selectedDonor.city}
+                <strong>Recent Illness:</strong> {selectedDonor.recentIllness}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Status:</strong>{" "}
+                <Typography
+                  component="span"
+                  sx={{
+                    color:
+                      selectedDonor?.status === "Approved"
+                        ? "success.main"
+                        : selectedDonor?.status === "Pending"
+                        ? "main.secondary"
+                        : "error.main",
+                  }}
+                >
+                  {selectedDonor.status}
+                </Typography>
               </Typography>
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogActions style={{ justifyContent: "center", padding: "20px" }}>
           <Button
             variant="contained"
+            sx={{ mr: 2, width: "40%" }}
             color="success"
-            onClick={() => approveMutation.mutate(selectedDonor.id)}
-            disabled={approveMutation.isLoading}
+            onClick={() => handleApproval(true)}
+            disabled={approveRejectMutation.isLoading}
           >
-            {approveMutation.isLoading ? "Approving..." : "Approve"}
+            {approveRejectMutation.isLoading ? "Approving..." : "Approve"}
           </Button>
           <Button
             variant="contained"
+            sx={{ ml: 2, width: "40%" }}
             color="error"
-            onClick={() => rejectMutation.mutate(selectedDonor.id)}
-            disabled={rejectMutation.isLoading}
+            onClick={() => handleApproval(false)}
+            disabled={approveRejectMutation.isLoading}
           >
-            {rejectMutation.isLoading ? "Rejecting..." : "Reject"}
+            {approveRejectMutation.isLoading ? "Rejecting..." : "Reject"}
           </Button>
         </DialogActions>
       </Dialog>

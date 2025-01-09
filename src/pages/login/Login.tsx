@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLogin } from "./useLogin";
 import CircularProgress from "@mui/material/CircularProgress";
-import "./Login.scss";
+import "./login.scss";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,29 +20,56 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>Login</h2>
+        <div className="logo-section">
+          <img src="/hewLogo.jpeg" alt="Hew Foundation" />
+          <h1>Hew Foundation</h1>
+        </div>
         
         <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <h2>Welcome Back</h2>
+          <p className="subtitle">Please enter your details to sign in</p>
+          
+          <div className="input-group">
+            <label>Email Address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
           {error && <p className="error-message">{errorMessage(error)}</p>}
-          <button type="submit" disabled={isLoading}>
+
+          <div className="options">
+            <label className="remember">
+              <input type="checkbox" />
+              <span>Remember me</span>
+            </label>
+            <a href="#" className="forgot">Forgot Password?</a>
+          </div>
+
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <CircularProgress size={20} style={{ color: "#fff" }} />
             ) : (
-              "Log In"
+              "Sign In"
             )}
           </button>
         </form>

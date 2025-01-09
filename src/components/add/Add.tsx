@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Grid,
-  TextField,
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
   FormControlLabel,
+  Grid,
   Radio,
   RadioGroup,
-  IconButton,
-  Typography,
-  useMediaQuery,
+  TextField,
+  useMediaQuery
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
 
 interface ModalProps {
   open: boolean;

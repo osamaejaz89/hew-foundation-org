@@ -3,6 +3,7 @@ import BigChartBox from "../../components/bigChartBox/BigChartBox";
 import ChartBox from "../../components/chartBox/ChartBox";
 import PieChartBox from "../../components/pieCartBox/PieChartBox";
 import TopBox from "../../components/topBox/TopBox";
+import TopUsers from "../../components/topUsers/TopUsers";
 import {
   barChartBoxRevenue,
   barChartBoxVisit,
@@ -12,15 +13,26 @@ import {
   chartBoxUser,
 } from "../../data";
 import "./home.scss";
+import { useUserApi } from "../../hooks/useUserApi";
 
 const Home = () => {
+  const { getUsers } = useUserApi();
+  const users = getUsers.data?.data || [];
+  
+  // Create chartBoxUser with real data
+  const userChartBox = {
+    ...chartBoxUser,
+    number: users.length.toString(),  // Convert total users to string
+    percentage: ((users.length / 100) * 100).toFixed(0),  // Calculate percentage
+  };
+
   return (
     <div className="home">
       <div className="box box1">
-        <TopBox />
+        <TopUsers />
       </div>
       <div className="box box2">
-        <ChartBox {...chartBoxUser} />
+        <ChartBox {...userChartBox} />
       </div>
       <div className="box box3">
         <ChartBox {...chartBoxProduct} />

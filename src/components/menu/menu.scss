@@ -1,5 +1,6 @@
-@import "../../styles/variables.scss";
-@import "../../styles/responsive.scss";
+@use '../../styles/variables' as *;
+@use '../../styles/responsive' as *;
+
 $hover-bg: #f0f0f0; // Set the desired hover background color
  $soft-color: #555; // Adjust this if needed
  $soft-bg: #eaeaea; // Adjust this if needed
@@ -12,13 +13,10 @@ $hover-bg: #f0f0f0; // Set the desired hover background color
 
     .title {
       font-size: 12px;
-      font-weight: 200;
-      color: "#5555";
+      font-weight: 500;
+      color: var(--soft-color);
       text-transform: uppercase;
-
-      @include lg {
-        display: none;
-      }
+      letter-spacing: 1px;
     }
 
     .listItem {
@@ -26,42 +24,91 @@ $hover-bg: #f0f0f0; // Set the desired hover background color
       align-items: center;
       gap: 10px;
       padding: 10px;
-      border-radius: 5px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
       cursor: pointer;
-      &:hover {
-        background-color: #f7eaeacc,
-      }
 
-      .listItemTitle {
-        @include lg {
-          display: none;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        
+        img {
+          opacity: 1;
         }
       }
-    }
-    
 
-    // Dropdown styles
-    &.dropdown {
-      position: relative;
-
-      .dropdownContent {
-        display: none;
-        position: absolute;
-        left: 0;
-        top: 100%;
-        background-color: $soft-bg;
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        z-index: 10;
+      &.active {
+        background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+        border-left: 3px solid var(--main-color);
+        
+        img {
+          opacity: 1;
+        }
       }
 
-      &:hover {
-        .dropdownContent {
-          display: block; // Show dropdown on hover
+      &.dropdown-header {
+        justify-content: space-between;
+        
+        .left-content {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .arrow-icon {
+          width: 20px;
+          height: 20px;
+          color: var(--soft-color);
+          transition: transform 0.3s ease;
+        }
+      }
+
+      img {
+        width: 20px;
+        height: 20px;
+        opacity: 0.7;
+      }
+
+      span {
+        color: var(--soft-color);
+        font-size: 14px;
+      }
+    }
+
+    .nested-items {
+      margin-left: 30px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      
+      &.open {
+        max-height: 500px; // Adjust this value based on your content
+      }
+      
+      .listItem {
+        position: relative;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: -30px;
+          top: 50%;
+          width: 20px;
+          height: 1px;
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &:hover::before,
+        &.active::before {
+          background-color: var(--main-color);
         }
       }
     }
   }
+}
+
+:root {
+  --main-color: #1976d2;
+  --soft-color: #b7bac1;
+  --dark-bg: #182237;
 }
