@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import ReusableModal from "../../components/add/Add";
 import DataTable from "../../components/dataTable/DataTable";
-import "./Users.scss";
+import "./users.scss";
 import { useUserApi } from '../../hooks/useUserApi';
 import { useQueryClient } from '@tanstack/react-query';
 import VerificationModal from "../../components/verificationModal/VerificationModal";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLogin } from "./useLogin";
 import CircularProgress from "@mui/material/CircularProgress";
-import "./login.scss";
+import "./Login.scss";
 
 const Login = () => {
   const [email, setEmail] = useState("");
