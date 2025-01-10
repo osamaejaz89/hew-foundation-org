@@ -4,51 +4,28 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Grid,
-  Modal,
-  Typography,
+  Typography
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import HorizontalCard from "./horizontalCard";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // React Query hooks
-import { toast } from "react-toastify"; // React-Toastify
-import "react-toastify/dist/ReactToastify.css"; // Import CSS
-import { getBloodRequest, useApproveRejectBloodRequest } from "./useBloodApi";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useApproveRejectBloodRequest } from "./useBloodApi";
+import { toast } from "react-toastify";
+import { getBloodRequest } from "./useBloodApi";
+import HorizontalCard from "./horizontalCard";
 
-const donorRequests = [
-  {
-    id: 1,
-    name: "John Doe",
-    bloodGroup: "O+",
-    requiredDate: "2024-12-15",
-    email: "john@example.com",
-    phone: "123-456-7890",
-    hospitalAddress: "City Hospital, Street 10",
-    city: "New York",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    bloodGroup: "A-",
-    requiredDate: "2024-12-20",
-    email: "jane@example.com",
-    phone: "987-654-3210",
-    hospitalAddress: "Care Medical, Main Avenue",
-    city: "Los Angeles",
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    bloodGroup: "B+",
-    requiredDate: "2024-12-18",
-    email: "michael@example.com",
-    phone: "555-123-4567",
-    hospitalAddress: "Saint Mary's Hospital",
-    city: "Chicago",
-  },
-];
+interface BloodRequest {
+  id: string;
+  contactPerson: string;
+  patientName: string;
+  bloodGroup: string;
+  requiredDate: string;
+  donor?: {
+    email: string;
+    phone: string;
+  };
+}
 
 export default function BloodRequest() {
   const [selectedDonor, setSelectedDonor] = useState<any>(null);
@@ -92,7 +69,7 @@ export default function BloodRequest() {
   //   error,
   // } = getBloodRequest();
   const {
-    data: bloodRequestsData = [], // Default to an empty array if no data
+    data: bloodRequestsData = [] as BloodRequest[], 
     isLoading,
     isError,
     error,
@@ -118,7 +95,7 @@ export default function BloodRequest() {
 
       {/* Donor Cards Grid */}
       <Grid container spacing={3}>
-        {bloodRequestsData.map((donor: any) => (
+        {bloodRequestsData.map((donor: BloodRequest) => (
           <Grid item xs={12} sm={6} key={donor.id}>
             <HorizontalCard
               donor={donor}

@@ -18,16 +18,15 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: Record<string, any>) => void;
-  title: string;
   initialData?: Record<string, any>;
   fields: { name: string; label: string; type: string; options?: string[] }[]; // Add `options` for radio inputs
+  title?: string;
 }
 
 const ReusableModal: React.FC<ModalProps> = ({
   open,
   onClose,
   onSubmit,
-  title,
   initialData = {},
   fields,
 }) => {

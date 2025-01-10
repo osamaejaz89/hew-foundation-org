@@ -104,7 +104,7 @@ const BloodDetails = () => {
     }
   }, [bloodUsers]); // Dependency array ensures this runs only when bloodUsers change
   
-  const handleDeleteApi = async (id: number) => {
+  const handleDeleteApi = async (id: string) => {
     try {
       console.log(`Deleting donor with ID: ${id}`);
       toast.success(`Deleted donor with ID: ${id}`);
@@ -166,7 +166,6 @@ const BloodDetails = () => {
           setEditData(null);
         }}
         onSubmit={handleAdd}
-        title={editData ? "Edit Donor" : "Add Donor"}
         initialData={editData || {}}
         fields={fields}
       />

@@ -1,10 +1,15 @@
 import { useApiQuery, useApiMutation, apiRequest } from './useApi';
 import { User } from '../types/user';
 import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 interface ApiResponse {
   success: boolean;
   data: User[];
+}
+
+interface ErrorWithPreviousUsers extends AxiosError {
+  previousUsers?: any;
 }
 
 export const useUserApi = () => {
@@ -36,10 +41,10 @@ export const useUserApi = () => {
       console.log("Verification success:", data);
       queryClient.invalidateQueries(['list-users']);
     },
-    onError: (error, variables, context: any) => {
-      console.error("Verification error:", error);
-      if (context?.previousUsers) {
-        queryClient.setQueryData(['list-users'], context.previousUsers);
+    onError: (error: ErrorWithPreviousUsers) => {
+      console.error("Error:", error);
+      if (error?.previousUsers) {
+        queryClient.setQueryData(['list-users'], error.previousUsers);
       }
     }
   });

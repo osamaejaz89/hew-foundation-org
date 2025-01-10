@@ -2,10 +2,16 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { apiRequest } from './useApi';
+import { User } from '@/types/user';
 
 interface LoginCredentials {
   email: string;
   password: string;
+}
+
+interface LoginResponse {
+  token: string;
+  user: User;
 }
 
 export const useLogin = () => {
@@ -13,10 +19,10 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const response = await apiRequest('/auth/login', 'POST', credentials);
+      const response = await apiRequest<LoginResponse>('/auth/login', 'POST', credentials);
       return response;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: LoginResponse) => {
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast.success('Login successful!');

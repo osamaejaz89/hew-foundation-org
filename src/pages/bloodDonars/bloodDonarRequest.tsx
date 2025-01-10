@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import HorizontalCard from "./horizontalCard";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getBloodDonar, useApprovedRejectBloodDonor } from "./useBloodApi";

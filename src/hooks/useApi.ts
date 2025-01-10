@@ -46,10 +46,14 @@ export const useApiQuery = <T>(
   });
 };
 
+interface CustomMutationOptions<T> extends UseMutationOptions<T, AxiosError, any> {
+  method?: string;
+}
+
 // API hook for mutations (POST, PUT, DELETE requests)
 export const useApiMutation = <T>(
   endpoint: string,
-  options: UseMutationOptions<T, AxiosError, any> = {}
+  options: CustomMutationOptions<T> = {}
 ) => {
   return useMutation<T, AxiosError, any>({
     ...options,

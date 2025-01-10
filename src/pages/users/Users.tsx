@@ -1,13 +1,18 @@
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ReusableModal from "../../components/add/Add";
 import DataTable from "../../components/dataTable/DataTable";
-import { userRows } from "../../data";
 import "./Users.scss";
 import { useUserApi } from '../../hooks/useUserApi';
 import { useQueryClient } from '@tanstack/react-query';
 import VerificationModal from "../../components/verificationModal/VerificationModal";
+import { User } from '@/types/user';
+
+// Add type for params
+interface GridParams extends GridRenderCellParams {
+  row: User;
+}
 
 const Users = () => {
   const [open, setOpen] = useState(false);
@@ -35,9 +40,7 @@ const Users = () => {
       type: "text", 
       width: 90, 
       forGrid: true,
-      renderCell: (params: any) => {
-        return params.id;
-      }
+      renderCell: (params: GridRenderCellParams) => params.id
     },
     { 
       name: "img", 
@@ -45,15 +48,18 @@ const Users = () => {
       type: "image", 
       width: 100, 
       forGrid: true,
-      renderCell: (params) => (
-        <div className="avatar-cell">
-          <img 
-            src="/noavatar.png" 
-            alt="User Avatar" 
-            className="avatar-image"
-          />
-        </div>
-      )
+      renderCell: (params: GridRenderCellParams) => {
+        if (!params.row) return null;
+        return (
+          <div className="avatar-cell">
+            <img 
+              src="/noavatar.png" 
+              alt="User Avatar" 
+              className="avatar-image"
+            />
+          </div>
+        );
+      }
     },
     { name: "name", label: "Name", type: "text", width: 200 },
     { name: "email", label: "Email", type: "text", width: 200 },
@@ -63,7 +69,7 @@ const Users = () => {
       label: "Created At", 
       type: "text", 
       width: 200,
-      renderCell: (params) => {
+      renderCell: (params: GridRenderCellParams) => {
         const date = new Date(params.row.createdAt);
         return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
       }
@@ -75,7 +81,7 @@ const Users = () => {
       type: "text", 
       width: 150,
       forGrid: true,
-      renderCell: (params) => {
+      renderCell: (params: GridRenderCellParams) => {
         const isVerified = params.row.verified;
         return (
           <div 
@@ -98,7 +104,7 @@ const Users = () => {
       type: "actions", 
       width: 120, 
       forGrid: true,
-      renderCell: (params) => (
+      renderCell: (params: GridParams) => (
         <div className="action-cell">
           <div className="edit-button" onClick={() => handleEdit(params.row)}>
             <img src="/view.svg" alt="Edit" />
@@ -128,9 +134,9 @@ const Users = () => {
     .map(({ name, label, type }) => ({ name, label, type }));
 
   // Handle Delete User API
-  const handleDeleteApi = async (id: number) => {
+  const handleDeleteApi = async (id: string) => {
     try {
-      await deleteUser.mutateAsync(id.toString());
+      await deleteUser.mutateAsync(id);
       toast.success(`Deleted user successfully`);
       queryClient.invalidateQueries(['list-users']);
     } catch (error) {
@@ -227,7 +233,6 @@ const Users = () => {
           setEditData(null);
         }}
         onSubmit={handleAdd}
-        title={editData ? "Edit User" : "Add User"}
         initialData={editData || {}}
         fields={fields}
       />

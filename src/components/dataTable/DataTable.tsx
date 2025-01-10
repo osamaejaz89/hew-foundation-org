@@ -7,7 +7,7 @@ interface Props {
   columns: GridColDef[];
   rows: any[];
   slug: string;
-  handleDeleteApi: (id: number) => Promise<void>;
+  handleDeleteApi: (id: string) => Promise<void>;
   handleEdit: (row: Record<string, any>) => void;
   loading?: boolean;
   getRowId?: (row: any) => string | number;
