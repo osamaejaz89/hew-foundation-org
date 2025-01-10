@@ -1,10 +1,6 @@
-import express from 'express'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
-import compression from 'compression'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const express = require('express')
+const path = require('path')
+const compression = require('compression')
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -13,11 +9,11 @@ const PORT = process.env.PORT || 4000
 app.use(compression())
 
 // Serve static files from dist directory
-app.use(express.static(join(__dirname, 'dist')))
+app.use(express.static(path.join(__dirname, 'dist')))
 
 // Handle client-side routing
 app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'index.html'))
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
 app.listen(PORT, () => {
