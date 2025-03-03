@@ -18,8 +18,8 @@ export const apiRequest = async <T>(
 ): Promise<T> => {
   try {
     const token = localStorage.getItem("authToken");
-    const fullUrl = endpoint.startsWith('http') 
-      ? endpoint 
+    const fullUrl = endpoint.startsWith('http')
+      ? endpoint
       : `${BASE_URL}/${endpoint}`;
 
     const response: AxiosResponse<T> = await axios({

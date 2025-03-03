@@ -112,3 +112,11 @@ $hover-bg: #f0f0f0; // Set the desired hover background color
   --soft-color: #b7bac1;
   --dark-bg: #182237;
 }
+
+.menuLink {
+    // ... existing styles ...
+    
+    img {
+        filter: brightness(0) invert(1); // This will make any black icon white
+    }
+}

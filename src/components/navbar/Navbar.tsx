@@ -5,29 +5,36 @@ import { useEffect, useState } from "react";
 const Navbar = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<{ name: string; role: string }>({ 
-    name: '', 
+    name: 'Admin', 
     role: 'Administrator' 
   });
   
   useEffect(() => {
-    // Get user data from localStorage
-    const user = localStorage.getItem("user");
-    if (user) {
+    const getUserData = () => {
       try {
-        const parsedUser = JSON.parse(user);
-        setUserData({
-          name: parsedUser.name || 'Admin',
-          role: parsedUser.role || 'Administrator'
-        });
+        const userStr = localStorage.getItem("user");
+        
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          setUserData({
+            name: user.name || 'Admin',
+            role: user.role || 'Administrator'
+          });
+        }
       } catch (error) {
-        console.error("Error parsing user data:", error);
+        console.error("Error loading user data:", error);
       }
-    }
+    };
+
+    getUserData();
+    
+    // Add event listener for storage changes
+    window.addEventListener('storage', getUserData);
+    return () => window.removeEventListener('storage', getUserData);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+    localStorage.clear(); // Clear all storage
     navigate("/login");
   };
 
@@ -54,7 +61,7 @@ const Navbar = () => {
           />
           <div className="info">
             <span className="username">{userData.name}</span>
-            <span className="role">{userData.role}</span>
+            {/* <span className="role">{userData.role}</span> */}
           </div>
         </div>
         <button className="logout" onClick={handleLogout}>

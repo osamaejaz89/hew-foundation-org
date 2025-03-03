@@ -11,6 +11,7 @@ interface Props {
   handleEdit: (row: Record<string, any>) => void;
   loading?: boolean;
   getRowId?: (row: any) => string | number;
+  onSearchChange?: (value: string) => void;
 }
 
 const DataTable = (props: Props) => {

@@ -46,6 +46,12 @@ export const menu = [
           },
         ],
       },
+      {
+        id: 3,
+        title: "Donations",
+        url: "/donations",
+        icon: "payments.svg",
+      },
     ],
   },
 ];

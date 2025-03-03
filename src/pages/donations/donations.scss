@@ -1,0 +1,74 @@
+.donations {
+  padding: 20px;
+  background-color: #f8f9fa;
+
+  .info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 0 10px;
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #343a40;
+    }
+  }
+
+  // Add styles for filter controls
+  .MuiStack-root {
+    .MuiFormControl-root {
+      background-color: #fff;
+      
+      .MuiOutlinedInput-root {
+        &:hover .MuiOutlinedInput-notchedOutline {
+          border-color: #1976d2;
+        }
+      }
+
+      .MuiMenuItem-root {
+        &.Mui-disabled {
+          opacity: 1;
+          background-color: #f8f9fa;
+        }
+      }
+    }
+  }
+
+  .MuiDataGrid-root {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    .MuiDataGrid-cell {
+      color: #333;
+      border-color: #f0f0f0;
+    }
+
+    .MuiDataGrid-columnHeaders {
+      background-color: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .MuiDataGrid-footerContainer {
+      background-color: #fff;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .status-cell {
+      &.Approved {
+        color: #28a745;
+      }
+      &.Rejected {
+        color: #dc3545;
+      }
+      &.Pending {
+        color: #ffc107;
+      }
+    }
+  }
+} 

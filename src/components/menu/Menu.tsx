@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import "./menu.scss";
-import { menu } from "../../data";
-import { useLocation } from "react-router-dom";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { menu } from "../../data";
+import "./menu.scss";
 
 const Menu = () => {
   const location = useLocation();

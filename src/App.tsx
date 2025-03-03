@@ -21,6 +21,7 @@ import "./styles/global.scss";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import BloodRequest from "./pages/bloodDonars/bloodRequest";
+import Donations from "./pages/donations/Donations";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +119,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <BloodDonarRequest />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/donations",
+          element: (
+            <ProtectedRoute>
+              <Donations />
             </ProtectedRoute>
           ),
         },
