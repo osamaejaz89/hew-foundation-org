@@ -23,6 +23,10 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import BloodRequest from "./pages/bloodDonars/bloodRequest";
 import Donations from "./pages/donations/Donations";
 import FamilyManagement from "./pages/FamilyManagement";
+import AdminJobs from "./pages/admin/Jobs";
+import AdminJobApplications from "./pages/admin/JobApplications";
+import AdminScholarships from "./pages/admin/Scholarships";
+import AdminMarriageProfiles from "./pages/admin/MarriageProfiles";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +140,39 @@ function App() {
           element: (
             <ProtectedRoute>
               <FamilyManagement />
+            </ProtectedRoute>
+          ),
+        },
+        // Admin Routes
+        {
+          path: "/admin/jobs",
+          element: (
+            <ProtectedRoute>
+              <AdminJobs />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/job-applications",
+          element: (
+            <ProtectedRoute>
+              <AdminJobApplications />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/scholarships",
+          element: (
+            <ProtectedRoute>
+              <AdminScholarships />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/marriage-profiles",
+          element: (
+            <ProtectedRoute>
+              <AdminMarriageProfiles />
             </ProtectedRoute>
           ),
         },

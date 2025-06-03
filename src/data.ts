@@ -60,6 +60,43 @@ export const menu = [
       },
     ],
   },
+  {
+    id: 3,
+    title: "admin",
+    listItems: [
+      {
+        id: 1,
+        title: "Jobs",
+        icon: "job.svg",
+        nestedItems: [
+          {
+            id: 1,
+            title: "All Jobs",
+            url: "/admin/jobs",
+            icon: "list.svg",
+          },
+          {
+            id: 2,
+            title: "Job Applications",
+            url: "/admin/job-applications",
+            icon: "application.svg",
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: "Scholarships",
+        icon: "scholarship.svg",
+        url: "/admin/scholarships",
+      },
+      {
+        id: 3,
+        title: "Marriage Profiles",
+        icon: "marriage.svg",
+        url: "/admin/marriage-profiles",
+      },
+    ],
+  },
 ];
 
 export const topDealUsers = [
