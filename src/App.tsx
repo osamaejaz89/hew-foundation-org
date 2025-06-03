@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import BloodRequest from "./pages/bloodDonars/bloodRequest";
 import Donations from "./pages/donations/Donations";
+import FamilyManagement from "./pages/FamilyManagement";
 
 const queryClient = new QueryClient();
 
@@ -127,6 +128,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <Donations />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/families",
+          element: (
+            <ProtectedRoute>
+              <FamilyManagement />
             </ProtectedRoute>
           ),
         },

@@ -52,6 +52,12 @@ export const menu = [
         url: "/donations",
         icon: "payments.svg",
       },
+      {
+        id: 4,
+        title: "Family Management",
+        url: "/families",
+        icon: "user.svg",
+      },
     ],
   },
 ];
