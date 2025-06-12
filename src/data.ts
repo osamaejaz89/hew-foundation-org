@@ -72,7 +72,7 @@ export const menu = [
           {
             id: 1,
             title: "All Jobs",
-            url: "/admin/jobs",
+            url: "/jobs",
             icon: "list.svg",
           },
           {

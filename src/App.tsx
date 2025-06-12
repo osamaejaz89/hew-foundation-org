@@ -27,6 +27,7 @@ import AdminJobs from "./pages/admin/Jobs";
 import AdminJobApplications from "./pages/admin/JobApplications";
 import AdminScholarships from "./pages/admin/Scholarships";
 import AdminMarriageProfiles from "./pages/admin/MarriageProfiles";
+import EditJob from "./pages/admin/EditJob";
 
 const queryClient = new QueryClient();
 
@@ -145,7 +146,7 @@ function App() {
         },
         // Admin Routes
         {
-          path: "/admin/jobs",
+          path: "/jobs",
           element: (
             <ProtectedRoute>
               <AdminJobs />
@@ -173,6 +174,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <AdminMarriageProfiles />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/jobs/edit/:id",
+          element: (
+            <ProtectedRoute>
+              <EditJob />
             </ProtectedRoute>
           ),
         },
