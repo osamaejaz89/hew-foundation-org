@@ -395,35 +395,34 @@ export const updateJobApplicationStatus = async (
 };
 
 // Scholarships
-export const createScholarship = async (data: {
+export interface ScholarshipData {
   title: string;
   description: string;
+  eligibility: string;
+  coverage: string;
   amount: number;
-  category: string;
-  requirements: {
-    gpa: number;
-    documents: string[];
-  };
+  status: string;
+  requirements: string[];
   deadline: string;
+  maxApplicants: number;
   isActive: boolean;
-}) => {
+  metadata: {
+    duration: string;
+    renewable: boolean;
+    minimumGPA: number;
+    programs: string[];
+    semesters: string[];
+    priorityDeadline: string;
+  };
+}
+
+export const createScholarship = async (data: ScholarshipData) => {
   return apiClient.post("/api/admin/scholarships", data);
 };
 
 export const updateScholarship = async (
   id: string,
-  data: {
-    title?: string;
-    description?: string;
-    amount?: number;
-    category?: string;
-    requirements?: {
-      gpa?: number;
-      documents?: string[];
-    };
-    deadline?: string;
-    isActive?: boolean;
-  }
+  data: Partial<ScholarshipData>
 ) => {
   return apiClient.patch(`/api/admin/scholarships/${id}`, data);
 };

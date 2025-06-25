@@ -4,298 +4,562 @@ import {
   Card,
   CardContent,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Grid,
+  Button,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Avatar,
+  Pagination,
+  CircularProgress,
+  Alert,
+  Stack,
   TextField,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
-  Grid,
-  Button,
-  Chip,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Slider,
+  Tooltip,
 } from '@mui/material';
-import { Visibility as VisibilityIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Visibility as VisibilityIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 import {
   getMarriageProfiles,
   getMarriageProfileById,
   updateMarriageProfileStatus,
-  searchMarriageProfiles,
   MarriageProfileFilters,
 } from '../../services/adminService';
+import SearchIcon from '@mui/icons-material/Search';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import DataTable from '../../components/dataTable/DataTable';
+import { GridColDef } from '@mui/x-data-grid';
+
+const DEFAULT_AVATAR = '/public/noavatar.png';
 
 const AdminMarriageProfiles: React.FC = () => {
   const [profiles, setProfiles] = useState<any[]>([]);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
   const [filters, setFilters] = useState<MarriageProfileFilters>({
     page: 1,
     limit: 10,
   });
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [newStatus, setNewStatus] = useState('');
-  const [ageRange, setAgeRange] = useState<number[]>([18, 60]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [searchField, setSearchField] = useState<'name' | 'email' | 'cnic' | 'city'>('name');
 
   useEffect(() => {
     fetchProfiles();
+    // eslint-disable-next-line
   }, [filters]);
 
   const fetchProfiles = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await getMarriageProfiles(filters);
-      setProfiles(response.data?.profiles || []);
-    } catch (error) {
-      console.error('Error fetching profiles:', error);
+      console.log(response.data.data);
+      setProfiles(response.data?.data || []);
+      setPagination(response.data?.pagination || { total: 0, page: 1, pages: 1 });
+    } catch (err: any) {
+      setError('Failed to fetch profiles. Please try again.');
       setProfiles([]);
-    }
-  };
-
-  const handleSearch = async () => {
-    try {
-      const response = await searchMarriageProfiles({
-        ...filters,
-        minAge: ageRange[0],
-        maxAge: ageRange[1],
-      });
-      setProfiles(response.data?.profiles || []);
-    } catch (error) {
-      console.error('Error searching profiles:', error);
-      setProfiles([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleViewDetails = async (id: string) => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await getMarriageProfileById(id);
-      setSelectedProfile(response.data);
+      setSelectedProfile(response.data?.data);
       setDetailsDialogOpen(true);
-    } catch (error) {
-      console.error('Error fetching profile details:', error);
+    } catch (err: any) {
+      setError('Failed to fetch profile details.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleUpdateStatus = async () => {
-    if (!selectedProfile) return;
+  const handlePageChange = (_: any, value: number) => {
+    setFilters((prev) => ({ ...prev, page: value }));
+  };
 
+  const handleApprove = async (profileId: string) => {
     try {
-      await updateMarriageProfileStatus(selectedProfile.id, {
-        status: newStatus,
-      });
-      setStatusDialogOpen(false);
+      setLoading(true);
+      await updateMarriageProfileStatus(profileId, { status: 'approved' });
       fetchProfiles();
-    } catch (error) {
-      console.error('Error updating profile status:', error);
+    } catch (err) {
+      setError('Failed to approve profile.');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleReject = async (profileId: string) => {
+    try {
+      setLoading(true);
+      await updateMarriageProfileStatus(profileId, { status: 'rejected' });
+      fetchProfiles();
+    } catch (err) {
+      setError('Failed to reject profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearFilters = () => {
+    setFilters({ page: 1, limit: 10 });
+    setSearch('');
+    setSearchField('name');
+  };
+
+  const totalProfiles = profiles.length;
+  const pendingCount = profiles.filter(p => p.status === 'pending').length;
+  const approvedCount = profiles.filter(p => p.status === 'approved').length;
+  const rejectedCount = profiles.filter(p => p.status === 'rejected').length;
+
+  const exportCSV = () => {
+    if (!profiles.length) return;
+    const headers = [
+      'Full Name', 'Gender', 'City', 'Country', 'Date of Birth', 'Marital Status', 'Religion', 'CNIC', 'Email', 'Phone', 'Status', 'Is Active'
+    ];
+    const rows = profiles.map(p => [
+      p.fullName,
+      p.gender,
+      p.city,
+      p.country,
+      p.dateOfBirth,
+      p.maritalStatus,
+      p.religion,
+      p.cnic,
+      p.email,
+      p.phone,
+      p.status,
+      p.isActive ? 'Active' : 'Inactive',
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(x => `"${x ?? ''}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'marriage_profiles.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // DataTable columns
+  const columns: GridColDef[] = [
+    {
+      field: 'profilePicture',
+      headerName: 'Photo',
+      width: 70,
+      renderCell: (params) => (
+        <Avatar src={params.row.profilePicture ? `/${params.row.profilePicture}` : DEFAULT_AVATAR} alt={params.row.fullName} sx={{ width: 40, height: 40 }} />
+      ),
+      sortable: false,
+      filterable: false,
+      align: 'center',
+      headerAlign: 'center',
+    },
+    {
+      field: 'fullName',
+      headerName: 'Name',
+      width: 160,
+      renderCell: (params) => (
+        <Typography fontWeight={500}>{params.row.fullName}</Typography>
+      ),
+    },
+    {
+      field: 'gender',
+      headerName: 'Gender',
+      width: 90,
+      renderCell: (params) => (
+        <Chip label={params.row.gender} size="small" color={params.row.gender === 'male' ? 'primary' : params.row.gender === 'female' ? 'secondary' : 'default'} />
+      ),
+    },
+    {
+      field: 'age',
+      headerName: 'Age',
+      width: 80,
+      valueGetter: (params) => params.row.dateOfBirth ? new Date().getFullYear() - new Date(params.row.dateOfBirth).getFullYear() : '-',
+    },
+    {
+      field: 'city',
+      headerName: 'City',
+      width: 120,
+    },
+    {
+      field: 'maritalStatus',
+      headerName: 'Marital Status',
+      width: 120,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 110,
+      renderCell: (params) => (
+        <Chip
+          label={params.row.status}
+          size="small"
+          color={params.row.status === 'approved' ? 'success' : params.row.status === 'pending' ? 'warning' : 'error'}
+        />
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 140,
+      sortable: false,
+      filterable: false,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Tooltip title="View Details">
+            <IconButton color="primary" onClick={() => handleViewDetails(params.row._id)}>
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Approve">
+            <span>
+              <IconButton color="success" disabled={params.row.status === 'approved'} onClick={() => handleApprove(params.row._id)}>
+                <CheckIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Reject">
+            <span>
+              <IconButton color="error" disabled={params.row.status === 'rejected'} onClick={() => handleReject(params.row._id)}>
+                <CloseIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ];
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1, md: 3 } }}>
       <Typography variant="h4" gutterBottom>
         Marriage Profiles
       </Typography>
-
-      {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Gender</InputLabel>
-                <Select
-                  value={filters.gender || ''}
-                  onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Marital Status</InputLabel>
-                <Select
-                  value={filters.maritalStatus || ''}
-                  onChange={(e) => setFilters({ ...filters, maritalStatus: e.target.value })}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  <MenuItem value="single">Single</MenuItem>
-                  <MenuItem value="divorced">Divorced</MenuItem>
-                  <MenuItem value="widowed">Widowed</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Religion</InputLabel>
-                <Select
-                  value={filters.religion || ''}
-                  onChange={(e) => setFilters({ ...filters, religion: e.target.value })}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  <MenuItem value="islam">Islam</MenuItem>
-                  <MenuItem value="christianity">Christianity</MenuItem>
-                  <MenuItem value="hinduism">Hinduism</MenuItem>
-                  <MenuItem value="buddhism">Buddhism</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                fullWidth
-                label="City"
-                value={filters.city || ''}
-                onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom>Age Range</Typography>
-              <Slider
-                value={ageRange}
-                onChange={(_, newValue) => setAgeRange(newValue as number[])}
-                valueLabelDisplay="auto"
-                min={18}
-                max={60}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" onClick={handleSearch} fullWidth>
-                Search
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* Profiles Table */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Age</TableCell>
-              <TableCell>Gender</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {profiles.map((profile) => (
-              <TableRow key={profile.id}>
-                <TableCell>{profile.name}</TableCell>
-                <TableCell>{profile.age}</TableCell>
-                <TableCell>{profile.gender}</TableCell>
-                <TableCell>{profile.city}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={profile.status}
-                    color={
-                      profile.status === 'approved'
-                        ? 'success'
-                        : profile.status === 'pending'
-                        ? 'warning'
-                        : 'error'
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleViewDetails(profile.id)}>
-                    <VisibilityIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => {
-                      setSelectedProfile(profile);
-                      setStatusDialogOpen(true);
-                    }}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <Box sx={{ mb: 3 }}>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid item xs={6} sm={3} md={2}>
+                <Card sx={{ p: 1, bgcolor: '#f5f5f5' }}>
+                  <Typography variant="subtitle2">Total</Typography>
+                  <Typography variant="h6">{totalProfiles}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={6} sm={3} md={2}>
+                <Card sx={{ p: 1, bgcolor: '#fffde7' }}>
+                  <Typography variant="subtitle2">Pending</Typography>
+                  <Typography variant="h6">{pendingCount}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={6} sm={3} md={2}>
+                <Card sx={{ p: 1, bgcolor: '#e8f5e9' }}>
+                  <Typography variant="subtitle2">Approved</Typography>
+                  <Typography variant="h6">{approvedCount}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={6} sm={3} md={2}>
+                <Card sx={{ p: 1, bgcolor: '#ffebee' }}>
+                  <Typography variant="subtitle2">Rejected</Typography>
+                  <Typography variant="h6">{rejectedCount}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                <Tooltip title="Export CSV">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<FileDownloadIcon />}
+                    onClick={exportCSV}
+                    sx={{ minWidth: 150 }}
                   >
-                    <EditIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Profile Details Dialog */}
+                    Export CSV
+                  </Button>
+                </Tooltip>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Gender</InputLabel>
+                  <Select
+                    value={filters.gender || ''}
+                    label="Gender"
+                    onChange={e => setFilters(f => ({ ...f, gender: e.target.value || undefined, page: 1 }))}
+                  >
+                    <MenuItem value="">All</MenuItem>
+                    <MenuItem value="male">Male</MenuItem>
+                    <MenuItem value="female">Female</MenuItem>
+                    <MenuItem value="other">Other</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  label="City"
+                  size="small"
+                  fullWidth
+                  value={filters.city || ''}
+                  onChange={e => setFilters(f => ({ ...f, city: e.target.value || undefined, page: 1 }))}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Marital Status</InputLabel>
+                  <Select
+                    value={filters.maritalStatus || ''}
+                    label="Marital Status"
+                    onChange={e => setFilters(f => ({ ...f, maritalStatus: e.target.value || undefined, page: 1 }))}
+                  >
+                    <MenuItem value="">All</MenuItem>
+                    <MenuItem value="single">Single</MenuItem>
+                    <MenuItem value="married">Married</MenuItem>
+                    <MenuItem value="divorced">Divorced</MenuItem>
+                    <MenuItem value="widowed">Widowed</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  label="Religion"
+                  size="small"
+                  fullWidth
+                  value={filters.religion || ''}
+                  onChange={e => setFilters(f => ({ ...f, religion: e.target.value || undefined, page: 1 }))}
+                />
+              </Grid>
+              <Grid item xs={6} sm={3} md={1}>
+                <TextField
+                  label="Min Age"
+                  size="small"
+                  type="number"
+                  fullWidth
+                  value={filters.minAge || ''}
+                  onChange={e => setFilters(f => ({ ...f, minAge: e.target.value ? Number(e.target.value) : undefined, page: 1 }))}
+                  inputProps={{ min: 0 }}
+                />
+              </Grid>
+              <Grid item xs={6} sm={3} md={1}>
+                <TextField
+                  label="Max Age"
+                  size="small"
+                  type="number"
+                  fullWidth
+                  value={filters.maxAge || ''}
+                  onChange={e => setFilters(f => ({ ...f, maxAge: e.target.value ? Number(e.target.value) : undefined, page: 1 }))}
+                  inputProps={{ min: 0 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Box display="flex" alignItems="center">
+                  <FormControl size="small" sx={{ minWidth: 100, mr: 1 }}>
+                    <InputLabel>Search By</InputLabel>
+                    <Select
+                      value={searchField}
+                      label="Search By"
+                      onChange={e => setSearchField(e.target.value as any)}
+                    >
+                      <MenuItem value="name">Name</MenuItem>
+                      <MenuItem value="email">Email</MenuItem>
+                      <MenuItem value="cnic">CNIC</MenuItem>
+                      <MenuItem value="city">City</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    label={`Search ${searchField.charAt(0).toUpperCase() + searchField.slice(1)}`}
+                    size="small"
+                    fullWidth
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined }));
+                      }
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton onClick={() => setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined }))}>
+                          <SearchIcon />
+                        </IconButton>
+                      ),
+                    }}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={6} md={1}>
+                <Button variant="outlined" color="secondary" fullWidth onClick={clearFilters}>
+                  Clear
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+          <DataTable
+            columns={columns}
+            rows={profiles}
+            slug="marriage-profiles"
+            handleDeleteApi={async () => {}}
+            handleEdit={() => {}}
+            loading={loading}
+            getRowId={row => row._id}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Pagination
+              count={pagination.pages}
+              page={pagination.page}
+              onChange={handlePageChange}
+              color="primary"
+              shape="rounded"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        </>
+      )}
+      {/* Profile Details Modal */}
       <Dialog
         open={detailsDialogOpen}
         onClose={() => setDetailsDialogOpen(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{ sx: { borderRadius: 2, bgcolor: '#fff' } }}
       >
-        <DialogTitle>Profile Details</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ borderBottom: '1px solid #e0e0e0', m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+            Profile Details
+          </Typography>
+          <IconButton onClick={() => setDetailsDialogOpen(false)} size="small">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          {console.log("selectedProfile", selectedProfile)}
           {selectedProfile && (
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="h6">Personal Information</Typography>
-                <Typography>Name: {selectedProfile.name}</Typography>
-                <Typography>Age: {selectedProfile.age}</Typography>
-                <Typography>Gender: {selectedProfile.gender}</Typography>
-                <Typography>Marital Status: {selectedProfile.maritalStatus}</Typography>
-                <Typography>Religion: {selectedProfile.religion}</Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+                  <Avatar
+                    src={selectedProfile.profilePicture ? `/${selectedProfile.profilePicture}` : DEFAULT_AVATAR}
+                    alt={selectedProfile.fullName}
+                    sx={{ width: 100, height: 100, mb: 2 }}
+                  />
+                  <Typography variant="h5" fontWeight={600}>{selectedProfile.fullName}</Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {selectedProfile.gender} | {selectedProfile.city} | {selectedProfile.country}
+                  </Typography>
+                  <Chip
+                    label={selectedProfile.isActive ? 'Active' : 'Inactive'}
+                    color={selectedProfile.isActive ? 'success' : 'error'}
+                    size="small"
+                    sx={{ mt: 1 }}
+                  />
+                </Box>
               </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6">Contact Information</Typography>
-                <Typography>Email: {selectedProfile.email}</Typography>
-                <Typography>Phone: {selectedProfile.phone}</Typography>
-                <Typography>City: {selectedProfile.city}</Typography>
-                <Typography>Country: {selectedProfile.country}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6">Education & Career</Typography>
-                <Typography>Education: {selectedProfile.education}</Typography>
-                <Typography>Occupation: {selectedProfile.occupation}</Typography>
-                <Typography>Income: {selectedProfile.income}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h6">Preferences</Typography>
-                <Typography>Partner Age Range: {selectedProfile.preferredAgeRange}</Typography>
-                <Typography>Partner Location: {selectedProfile.preferredLocation}</Typography>
-                <Typography>Partner Education: {selectedProfile.preferredEducation}</Typography>
+              <Grid item xs={12} md={8}>
+                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Personal Information</Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}><b>Date of Birth:</b> {selectedProfile.dateOfBirth ? new Date(selectedProfile.dateOfBirth).toLocaleDateString() : '-'}</Grid>
+                    <Grid item xs={6}><b>Marital Status:</b> {selectedProfile.maritalStatus}</Grid>
+                    <Grid item xs={6}><b>Religion:</b> {selectedProfile.religion}</Grid>
+                    <Grid item xs={6}><b>Sect:</b> {selectedProfile.sect}</Grid>
+                    <Grid item xs={6}><b>Mother Tongue:</b> {selectedProfile.motherTongue}</Grid>
+                    <Grid item xs={6}><b>CNIC:</b> {selectedProfile.cnic}</Grid>
+                    <Grid item xs={6}><b>Physical Appearance:</b> {selectedProfile.physicalAppearance}</Grid>
+                    <Grid item xs={6}><b>Height:</b> {selectedProfile.height}</Grid>
+                    <Grid item xs={6}><b>Weight:</b> {selectedProfile.weight}</Grid>
+                  </Grid>
+                </Box>
+                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Contact</Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}><b>Email:</b> {selectedProfile.email}</Grid>
+                    <Grid item xs={6}><b>Phone:</b> {selectedProfile.phone}</Grid>
+                    <Grid item xs={6}><b>City:</b> {selectedProfile.city}</Grid>
+                    <Grid item xs={6}><b>Country:</b> {selectedProfile.country}</Grid>
+                  </Grid>
+                </Box>
+                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Education & Career</Typography>
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}><b>Education:</b> {selectedProfile.education}</Grid>
+                    <Grid item xs={6}><b>Profession:</b> {selectedProfile.profession}</Grid>
+                    <Grid item xs={6}><b>Income:</b> {selectedProfile.income}</Grid>
+                  </Grid>
+                </Box>
+                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Family Details</Typography>
+                  {selectedProfile.familyDetails ? (
+                    <Grid container spacing={1}>
+                      <Grid item xs={6}><b>Father Name:</b> {selectedProfile.familyDetails.fatherName}</Grid>
+                      <Grid item xs={6}><b>Mother Name:</b> {selectedProfile.familyDetails.motherName}</Grid>
+                      <Grid item xs={6}><b>Siblings:</b> {selectedProfile.familyDetails.siblings}</Grid>
+                      <Grid item xs={6}><b>Family Status:</b> {selectedProfile.familyDetails.familyStatus}</Grid>
+                      <Grid item xs={6}><b>Family Profession:</b> {selectedProfile.familyDetails.familyProfession}</Grid>
+                    </Grid>
+                  ) : (
+                    <Typography color="text.secondary">No family details provided.</Typography>
+                  )}
+                </Box>
+                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1 }}>
+                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Preferences</Typography>
+                  {selectedProfile.preferences ? (
+                    <Grid container spacing={1}>
+                      <Grid item xs={6}><b>Age Range:</b> {selectedProfile.preferences.ageRange ? `${selectedProfile.preferences.ageRange.min} - ${selectedProfile.preferences.ageRange.max}` : '-'}</Grid>
+                      <Grid item xs={6}><b>Marital Status:</b> {selectedProfile.preferences.maritalStatus?.join(', ')}</Grid>
+                      <Grid item xs={6}><b>Height Preference:</b> {selectedProfile.preferences.heightPreference}</Grid>
+                      <Grid item xs={6}><b>City Preference:</b> {selectedProfile.preferences.cityPreference}</Grid>
+                      <Grid item xs={6}><b>Religion Preference:</b> {selectedProfile.preferences.religionPreference}</Grid>
+                    </Grid>
+                  ) : (
+                    <Typography color="text.secondary">No preferences provided.</Typography>
+                  )}
+                </Box>
               </Grid>
             </Grid>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Status Update Dialog */}
-      <Dialog open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)}>
-        <DialogTitle>Update Profile Status</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>New Status</InputLabel>
-            <Select
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value)}
-            >
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="approved">Approved</MenuItem>
-              <MenuItem value="rejected">Rejected</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setStatusDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleUpdateStatus} variant="contained" color="primary">
-            Update
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<CheckIcon />}
+            onClick={() => handleApprove(selectedProfile._id)}
+            disabled={selectedProfile?.status === 'approved' || loading}
+          >
+            Approve
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<CloseIcon />}
+            onClick={() => handleReject(selectedProfile._id)}
+            disabled={selectedProfile?.status === 'rejected' || loading}
+          >
+            Reject
+          </Button>
+          <Button onClick={() => setDetailsDialogOpen(false)}>
+            Close
           </Button>
         </DialogActions>
       </Dialog>
