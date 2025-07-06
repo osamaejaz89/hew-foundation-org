@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -23,20 +23,25 @@ import {
   InputLabel,
   IconButton,
   Tooltip,
-} from '@mui/material';
-import { Visibility as VisibilityIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
+  Paper,
+} from "@mui/material";
+import {
+  Visibility as VisibilityIcon,
+  Check as CheckIcon,
+  Close as CloseIcon,
+} from "@mui/icons-material";
 import {
   getMarriageProfiles,
   getMarriageProfileById,
   updateMarriageProfileStatus,
   MarriageProfileFilters,
-} from '../../services/adminService';
-import SearchIcon from '@mui/icons-material/Search';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import DataTable from '../../components/dataTable/DataTable';
-import { GridColDef } from '@mui/x-data-grid';
+} from "../../services/adminService";
+import SearchIcon from "@mui/icons-material/Search";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import DataTable from "../../components/dataTable/DataTable";
+import { GridColDef } from "@mui/x-data-grid";
 
-const DEFAULT_AVATAR = '/public/noavatar.png';
+const DEFAULT_AVATAR = "/public/noavatar.png";
 
 const AdminMarriageProfiles: React.FC = () => {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -49,8 +54,10 @@ const AdminMarriageProfiles: React.FC = () => {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [searchField, setSearchField] = useState<'name' | 'email' | 'cnic' | 'city'>('name');
+  const [search, setSearch] = useState("");
+  const [searchField, setSearchField] = useState<
+    "name" | "email" | "cnic" | "city"
+  >("name");
 
   useEffect(() => {
     fetchProfiles();
@@ -64,9 +71,11 @@ const AdminMarriageProfiles: React.FC = () => {
       const response = await getMarriageProfiles(filters);
       console.log(response.data.data);
       setProfiles(response.data?.data || []);
-      setPagination(response.data?.pagination || { total: 0, page: 1, pages: 1 });
+      setPagination(
+        response.data?.pagination || { total: 0, page: 1, pages: 1 }
+      );
     } catch (err: any) {
-      setError('Failed to fetch profiles. Please try again.');
+      setError("Failed to fetch profiles. Please try again.");
       setProfiles([]);
     } finally {
       setLoading(false);
@@ -81,7 +90,7 @@ const AdminMarriageProfiles: React.FC = () => {
       setSelectedProfile(response.data?.data);
       setDetailsDialogOpen(true);
     } catch (err: any) {
-      setError('Failed to fetch profile details.');
+      setError("Failed to fetch profile details.");
     } finally {
       setLoading(false);
     }
@@ -94,10 +103,10 @@ const AdminMarriageProfiles: React.FC = () => {
   const handleApprove = async (profileId: string) => {
     try {
       setLoading(true);
-      await updateMarriageProfileStatus(profileId, { status: 'approved' });
+      await updateMarriageProfileStatus(profileId, { status: "approved" });
       fetchProfiles();
     } catch (err) {
-      setError('Failed to approve profile.');
+      setError("Failed to approve profile.");
     } finally {
       setLoading(false);
     }
@@ -106,10 +115,10 @@ const AdminMarriageProfiles: React.FC = () => {
   const handleReject = async (profileId: string) => {
     try {
       setLoading(true);
-      await updateMarriageProfileStatus(profileId, { status: 'rejected' });
+      await updateMarriageProfileStatus(profileId, { status: "rejected" });
       fetchProfiles();
     } catch (err) {
-      setError('Failed to reject profile.');
+      setError("Failed to reject profile.");
     } finally {
       setLoading(false);
     }
@@ -117,21 +126,32 @@ const AdminMarriageProfiles: React.FC = () => {
 
   const clearFilters = () => {
     setFilters({ page: 1, limit: 10 });
-    setSearch('');
-    setSearchField('name');
+    setSearch("");
+    setSearchField("name");
   };
 
   const totalProfiles = profiles.length;
-  const pendingCount = profiles.filter(p => p.status === 'pending').length;
-  const approvedCount = profiles.filter(p => p.status === 'approved').length;
-  const rejectedCount = profiles.filter(p => p.status === 'rejected').length;
+  const pendingCount = profiles.filter((p) => p.status === "pending").length;
+  const approvedCount = profiles.filter((p) => p.status === "approved").length;
+  const rejectedCount = profiles.filter((p) => p.status === "rejected").length;
 
   const exportCSV = () => {
     if (!profiles.length) return;
     const headers = [
-      'Full Name', 'Gender', 'City', 'Country', 'Date of Birth', 'Marital Status', 'Religion', 'CNIC', 'Email', 'Phone', 'Status', 'Is Active'
+      "Full Name",
+      "Gender",
+      "City",
+      "Country",
+      "Date of Birth",
+      "Marital Status",
+      "Religion",
+      "CNIC",
+      "Email",
+      "Phone",
+      "Status",
+      "Is Active",
     ];
-    const rows = profiles.map(p => [
+    const rows = profiles.map((p) => [
       p.fullName,
       p.gender,
       p.city,
@@ -143,14 +163,16 @@ const AdminMarriageProfiles: React.FC = () => {
       p.email,
       p.phone,
       p.status,
-      p.isActive ? 'Active' : 'Inactive',
+      p.isActive ? "Active" : "Inactive",
     ]);
-    const csvContent = [headers, ...rows].map(r => r.map(x => `"${x ?? ''}"`).join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const csvContent = [headers, ...rows]
+      .map((r) => r.map((x) => `"${x ?? ""}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'marriage_profiles.csv';
+    a.download = "marriage_profiles.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -158,86 +180,125 @@ const AdminMarriageProfiles: React.FC = () => {
   // DataTable columns
   const columns: GridColDef[] = [
     {
-      field: 'profilePicture',
-      headerName: 'Photo',
+      field: "profilePicture",
+      headerName: "Photo",
       width: 70,
       renderCell: (params) => (
-        <Avatar src={params.row.profilePicture ? `/${params.row.profilePicture}` : DEFAULT_AVATAR} alt={params.row.fullName} sx={{ width: 40, height: 40 }} />
+        <Avatar
+          src={
+            params.row.profilePicture
+              ? `/${params.row.profilePicture}`
+              : DEFAULT_AVATAR
+          }
+          alt={params.row.fullName}
+          sx={{ width: 40, height: 40 }}
+        />
       ),
       sortable: false,
       filterable: false,
-      align: 'center',
-      headerAlign: 'center',
+      align: "center",
+      headerAlign: "center",
     },
     {
-      field: 'fullName',
-      headerName: 'Name',
+      field: "fullName",
+      headerName: "Name",
       width: 160,
       renderCell: (params) => (
         <Typography fontWeight={500}>{params.row.fullName}</Typography>
       ),
     },
     {
-      field: 'gender',
-      headerName: 'Gender',
+      field: "gender",
+      headerName: "Gender",
       width: 90,
       renderCell: (params) => (
-        <Chip label={params.row.gender} size="small" color={params.row.gender === 'male' ? 'primary' : params.row.gender === 'female' ? 'secondary' : 'default'} />
+        <Chip
+          label={params.row.gender}
+          size="small"
+          color={
+            params.row.gender === "male"
+              ? "primary"
+              : params.row.gender === "female"
+              ? "secondary"
+              : "default"
+          }
+        />
       ),
     },
     {
-      field: 'age',
-      headerName: 'Age',
+      field: "age",
+      headerName: "Age",
       width: 80,
-      valueGetter: (params) => params.row.dateOfBirth ? new Date().getFullYear() - new Date(params.row.dateOfBirth).getFullYear() : '-',
+      valueGetter: (params) =>
+        params.row.dateOfBirth
+          ? new Date().getFullYear() -
+            new Date(params.row.dateOfBirth).getFullYear()
+          : "-",
     },
     {
-      field: 'city',
-      headerName: 'City',
+      field: "city",
+      headerName: "City",
       width: 120,
     },
     {
-      field: 'maritalStatus',
-      headerName: 'Marital Status',
+      field: "maritalStatus",
+      headerName: "Marital Status",
       width: 120,
     },
     {
-      field: 'status',
-      headerName: 'Status',
+      field: "status",
+      headerName: "Status",
       width: 110,
       renderCell: (params) => (
         <Chip
           label={params.row.status}
           size="small"
-          color={params.row.status === 'approved' ? 'success' : params.row.status === 'pending' ? 'warning' : 'error'}
+          color={
+            params.row.status === "approved"
+              ? "success"
+              : params.row.status === "pending"
+              ? "warning"
+              : "error"
+          }
         />
       ),
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "actions",
+      headerName: "Actions",
       width: 140,
       sortable: false,
       filterable: false,
-      align: 'center',
-      headerAlign: 'center',
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Tooltip title="View Details">
-            <IconButton color="primary" onClick={() => handleViewDetails(params.row._id)}>
+            <IconButton
+              color="primary"
+              onClick={() => handleViewDetails(params.row._id)}
+            >
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Approve">
             <span>
-              <IconButton color="success" disabled={params.row.status === 'approved'} onClick={() => handleApprove(params.row._id)}>
+              <IconButton
+                color="success"
+                disabled={params.row.status === "approved"}
+                onClick={() => handleApprove(params.row._id)}
+              >
                 <CheckIcon />
               </IconButton>
             </span>
           </Tooltip>
           <Tooltip title="Reject">
             <span>
-              <IconButton color="error" disabled={params.row.status === 'rejected'} onClick={() => handleReject(params.row._id)}>
+              <IconButton
+                color="error"
+                disabled={params.row.status === "rejected"}
+                onClick={() => handleReject(params.row._id)}
+              >
                 <CloseIcon />
               </IconButton>
             </span>
@@ -252,59 +313,59 @@ const AdminMarriageProfiles: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Marriage Profiles
       </Typography>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
           <CircularProgress />
         </Box>
       ) : (
         <>
-          <Box sx={{ mb: 3 }}>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={6} sm={3} md={2}>
-                <Card sx={{ p: 1, bgcolor: '#f5f5f5' }}>
-                  <Typography variant="subtitle2">Total</Typography>
-                  <Typography variant="h6">{totalProfiles}</Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={6} sm={3} md={2}>
-                <Card sx={{ p: 1, bgcolor: '#fffde7' }}>
-                  <Typography variant="subtitle2">Pending</Typography>
-                  <Typography variant="h6">{pendingCount}</Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={6} sm={3} md={2}>
-                <Card sx={{ p: 1, bgcolor: '#e8f5e9' }}>
-                  <Typography variant="subtitle2">Approved</Typography>
-                  <Typography variant="h6">{approvedCount}</Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={6} sm={3} md={2}>
-                <Card sx={{ p: 1, bgcolor: '#ffebee' }}>
-                  <Typography variant="subtitle2">Rejected</Typography>
-                  <Typography variant="h6">{rejectedCount}</Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-                <Tooltip title="Export CSV">
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<FileDownloadIcon />}
-                    onClick={exportCSV}
-                    sx={{ minWidth: 150 }}
-                  >
-                    Export CSV
-                  </Button>
-                </Tooltip>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={6} md={2}>
-                <FormControl fullWidth size="small">
+          {/* Professional summary and filter section */}
+          <Box sx={{ mb: 4 }}>
+            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, bgcolor: '#f4f6f8' }}>
+              {/* Summary Bar */}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', letterSpacing: 1 }}>
+                  Marriage Profile Summary
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<FileDownloadIcon />}
+                  onClick={exportCSV}
+                  sx={{ minWidth: 140, fontWeight: 600 }}
+                >
+                  Export CSV
+                </Button>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 3, mb: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ minWidth: 120, p: 2, bgcolor: '#fff', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle2" color="text.secondary">Total</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>{totalProfiles}</Typography>
+                </Box>
+                <Box sx={{ minWidth: 120, p: 2, bgcolor: '#fff', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle2" color="warning.main">Pending</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'warning.main' }}>{pendingCount}</Typography>
+                </Box>
+                <Box sx={{ minWidth: 120, p: 2, bgcolor: '#fff', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle2" color="success.main">Approved</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'success.main' }}>{approvedCount}</Typography>
+                </Box>
+                <Box sx={{ minWidth: 120, p: 2, bgcolor: '#fff', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle2" color="error.main">Rejected</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'error.main' }}>{rejectedCount}</Typography>
+                </Box>
+              </Box>
+              {/* Filter Form */}
+              <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 2, bgcolor: '#f8f9fa', p: 2, borderRadius: 2, boxShadow: 0 }} onSubmit={e => { e.preventDefault(); setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined })); }}>
+                <FormControl size="small" sx={{ minWidth: 130 }}>
                   <InputLabel>Gender</InputLabel>
                   <Select
-                    value={filters.gender || ''}
+                    value={filters.gender || ""}
                     label="Gender"
                     onChange={e => setFilters(f => ({ ...f, gender: e.target.value || undefined, page: 1 }))}
                   >
@@ -314,21 +375,17 @@ const AdminMarriageProfiles: React.FC = () => {
                     <MenuItem value="other">Other</MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6} md={2}>
                 <TextField
                   label="City"
                   size="small"
-                  fullWidth
-                  value={filters.city || ''}
+                  sx={{ minWidth: 130 }}
+                  value={filters.city || ""}
                   onChange={e => setFilters(f => ({ ...f, city: e.target.value || undefined, page: 1 }))}
                 />
-              </Grid>
-              <Grid item xs={12} sm={6} md={2}>
-                <FormControl fullWidth size="small">
+                <FormControl size="small" sx={{ minWidth: 150 }}>
                   <InputLabel>Marital Status</InputLabel>
                   <Select
-                    value={filters.maritalStatus || ''}
+                    value={filters.maritalStatus || ""}
                     label="Marital Status"
                     onChange={e => setFilters(f => ({ ...f, maritalStatus: e.target.value || undefined, page: 1 }))}
                   >
@@ -339,80 +396,75 @@ const AdminMarriageProfiles: React.FC = () => {
                     <MenuItem value="widowed">Widowed</MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6} md={2}>
                 <TextField
                   label="Religion"
                   size="small"
-                  fullWidth
-                  value={filters.religion || ''}
+                  sx={{ minWidth: 130 }}
+                  value={filters.religion || ""}
                   onChange={e => setFilters(f => ({ ...f, religion: e.target.value || undefined, page: 1 }))}
                 />
-              </Grid>
-              <Grid item xs={6} sm={3} md={1}>
                 <TextField
                   label="Min Age"
                   size="small"
                   type="number"
-                  fullWidth
-                  value={filters.minAge || ''}
+                  sx={{ minWidth: 90 }}
+                  value={filters.minAge || ""}
                   onChange={e => setFilters(f => ({ ...f, minAge: e.target.value ? Number(e.target.value) : undefined, page: 1 }))}
                   inputProps={{ min: 0 }}
                 />
-              </Grid>
-              <Grid item xs={6} sm={3} md={1}>
                 <TextField
                   label="Max Age"
                   size="small"
                   type="number"
-                  fullWidth
-                  value={filters.maxAge || ''}
+                  sx={{ minWidth: 90 }}
+                  value={filters.maxAge || ""}
                   onChange={e => setFilters(f => ({ ...f, maxAge: e.target.value ? Number(e.target.value) : undefined, page: 1 }))}
                   inputProps={{ min: 0 }}
                 />
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Box display="flex" alignItems="center">
-                  <FormControl size="small" sx={{ minWidth: 100, mr: 1 }}>
-                    <InputLabel>Search By</InputLabel>
-                    <Select
-                      value={searchField}
-                      label="Search By"
-                      onChange={e => setSearchField(e.target.value as any)}
-                    >
-                      <MenuItem value="name">Name</MenuItem>
-                      <MenuItem value="email">Email</MenuItem>
-                      <MenuItem value="cnic">CNIC</MenuItem>
-                      <MenuItem value="city">City</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    label={`Search ${searchField.charAt(0).toUpperCase() + searchField.slice(1)}`}
-                    size="small"
-                    fullWidth
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined }));
-                      }
-                    }}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton onClick={() => setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined }))}>
-                          <SearchIcon />
-                        </IconButton>
-                      ),
-                    }}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={6} md={1}>
-                <Button variant="outlined" color="secondary" fullWidth onClick={clearFilters}>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Search By</InputLabel>
+                  <Select
+                    value={searchField}
+                    label="Search By"
+                    onChange={e => setSearchField(e.target.value as any)}
+                  >
+                    <MenuItem value="name">Name</MenuItem>
+                    <MenuItem value="email">Email</MenuItem>
+                    <MenuItem value="cnic">CNIC</MenuItem>
+                    <MenuItem value="city">City</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  label={`Search ${searchField.charAt(0).toUpperCase() + searchField.slice(1)}`}
+                  size="small"
+                  sx={{ minWidth: 150 }}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined }));
+                    }
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        onClick={() => setFilters(f => ({ ...f, page: 1, [searchField]: search || undefined }))}
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    ),
+                  }}
+                />
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={clearFilters}
+                  sx={{ minWidth: 90, fontWeight: 600 }}
+                >
                   Clear
                 </Button>
-              </Grid>
-            </Grid>
+              </Box>
+            </Paper>
           </Box>
           <DataTable
             columns={columns}
@@ -421,9 +473,9 @@ const AdminMarriageProfiles: React.FC = () => {
             handleDeleteApi={async () => {}}
             handleEdit={() => {}}
             loading={loading}
-            getRowId={row => row._id}
+            getRowId={(row) => row._id}
           />
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <Pagination
               count={pagination.pages}
               page={pagination.page}
@@ -442,9 +494,18 @@ const AdminMarriageProfiles: React.FC = () => {
         onClose={() => setDetailsDialogOpen(false)}
         maxWidth="md"
         fullWidth
-        PaperProps={{ sx: { borderRadius: 2, bgcolor: '#fff' } }}
+        PaperProps={{ sx: { borderRadius: 2, bgcolor: "#fff" } }}
       >
-        <DialogTitle sx={{ borderBottom: '1px solid #e0e0e0', m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <DialogTitle
+          sx={{
+            borderBottom: "1px solid #e0e0e0",
+            m: 0,
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
             Profile Details
           </Typography>
@@ -457,82 +518,205 @@ const AdminMarriageProfiles: React.FC = () => {
           {selectedProfile && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    mb: 2,
+                  }}
+                >
                   <Avatar
-                    src={selectedProfile.profilePicture ? `/${selectedProfile.profilePicture}` : DEFAULT_AVATAR}
+                    src={
+                      selectedProfile.profilePicture
+                        ? `/${selectedProfile.profilePicture}`
+                        : DEFAULT_AVATAR
+                    }
                     alt={selectedProfile.fullName}
                     sx={{ width: 100, height: 100, mb: 2 }}
                   />
-                  <Typography variant="h5" fontWeight={600}>{selectedProfile.fullName}</Typography>
+                  <Typography variant="h5" fontWeight={600}>
+                    {selectedProfile.fullName}
+                  </Typography>
                   <Typography variant="body1" color="text.secondary">
-                    {selectedProfile.gender} | {selectedProfile.city} | {selectedProfile.country}
+                    {selectedProfile.gender} | {selectedProfile.city} |{" "}
+                    {selectedProfile.country}
                   </Typography>
                   <Chip
-                    label={selectedProfile.isActive ? 'Active' : 'Inactive'}
-                    color={selectedProfile.isActive ? 'success' : 'error'}
+                    label={selectedProfile.isActive ? "Active" : "Inactive"}
+                    color={selectedProfile.isActive ? "success" : "error"}
                     size="small"
                     sx={{ mt: 1 }}
                   />
                 </Box>
               </Grid>
               <Grid item xs={12} md={8}>
-                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Personal Information</Typography>
+                <Box sx={{ bgcolor: "#f8f9fa", p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    color="primary"
+                    mb={1}
+                  >
+                    Personal Information
+                  </Typography>
                   <Grid container spacing={1}>
-                    <Grid item xs={6}><b>Date of Birth:</b> {selectedProfile.dateOfBirth ? new Date(selectedProfile.dateOfBirth).toLocaleDateString() : '-'}</Grid>
-                    <Grid item xs={6}><b>Marital Status:</b> {selectedProfile.maritalStatus}</Grid>
-                    <Grid item xs={6}><b>Religion:</b> {selectedProfile.religion}</Grid>
-                    <Grid item xs={6}><b>Sect:</b> {selectedProfile.sect}</Grid>
-                    <Grid item xs={6}><b>Mother Tongue:</b> {selectedProfile.motherTongue}</Grid>
-                    <Grid item xs={6}><b>CNIC:</b> {selectedProfile.cnic}</Grid>
-                    <Grid item xs={6}><b>Physical Appearance:</b> {selectedProfile.physicalAppearance}</Grid>
-                    <Grid item xs={6}><b>Height:</b> {selectedProfile.height}</Grid>
-                    <Grid item xs={6}><b>Weight:</b> {selectedProfile.weight}</Grid>
+                    <Grid item xs={6}>
+                      <b>Date of Birth:</b>{" "}
+                      {selectedProfile.dateOfBirth
+                        ? new Date(
+                            selectedProfile.dateOfBirth
+                          ).toLocaleDateString()
+                        : "-"}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Marital Status:</b> {selectedProfile.maritalStatus}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Religion:</b> {selectedProfile.religion}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Sect:</b> {selectedProfile.sect}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Mother Tongue:</b> {selectedProfile.motherTongue}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>CNIC:</b> {selectedProfile.cnic}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Physical Appearance:</b>{" "}
+                      {selectedProfile.physicalAppearance}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Height:</b> {selectedProfile.height}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Weight:</b> {selectedProfile.weight}
+                    </Grid>
                   </Grid>
                 </Box>
-                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Contact</Typography>
+                <Box sx={{ bgcolor: "#f8f9fa", p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    color="primary"
+                    mb={1}
+                  >
+                    Contact
+                  </Typography>
                   <Grid container spacing={1}>
-                    <Grid item xs={6}><b>Email:</b> {selectedProfile.email}</Grid>
-                    <Grid item xs={6}><b>Phone:</b> {selectedProfile.phone}</Grid>
-                    <Grid item xs={6}><b>City:</b> {selectedProfile.city}</Grid>
-                    <Grid item xs={6}><b>Country:</b> {selectedProfile.country}</Grid>
+                    <Grid item xs={6}>
+                      <b>Email:</b> {selectedProfile.email}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Phone:</b> {selectedProfile.phone}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>City:</b> {selectedProfile.city}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Country:</b> {selectedProfile.country}
+                    </Grid>
                   </Grid>
                 </Box>
-                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Education & Career</Typography>
+                <Box sx={{ bgcolor: "#f8f9fa", p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    color="primary"
+                    mb={1}
+                  >
+                    Education & Career
+                  </Typography>
                   <Grid container spacing={1}>
-                    <Grid item xs={6}><b>Education:</b> {selectedProfile.education}</Grid>
-                    <Grid item xs={6}><b>Profession:</b> {selectedProfile.profession}</Grid>
-                    <Grid item xs={6}><b>Income:</b> {selectedProfile.income}</Grid>
+                    <Grid item xs={6}>
+                      <b>Education:</b> {selectedProfile.education}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Profession:</b> {selectedProfile.profession}
+                    </Grid>
+                    <Grid item xs={6}>
+                      <b>Income:</b> {selectedProfile.income}
+                    </Grid>
                   </Grid>
                 </Box>
-                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1, mb: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Family Details</Typography>
+                <Box sx={{ bgcolor: "#f8f9fa", p: 2, borderRadius: 1, mb: 2 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    color="primary"
+                    mb={1}
+                  >
+                    Family Details
+                  </Typography>
                   {selectedProfile.familyDetails ? (
                     <Grid container spacing={1}>
-                      <Grid item xs={6}><b>Father Name:</b> {selectedProfile.familyDetails.fatherName}</Grid>
-                      <Grid item xs={6}><b>Mother Name:</b> {selectedProfile.familyDetails.motherName}</Grid>
-                      <Grid item xs={6}><b>Siblings:</b> {selectedProfile.familyDetails.siblings}</Grid>
-                      <Grid item xs={6}><b>Family Status:</b> {selectedProfile.familyDetails.familyStatus}</Grid>
-                      <Grid item xs={6}><b>Family Profession:</b> {selectedProfile.familyDetails.familyProfession}</Grid>
+                      <Grid item xs={6}>
+                        <b>Father Name:</b>{" "}
+                        {selectedProfile.familyDetails.fatherName}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Mother Name:</b>{" "}
+                        {selectedProfile.familyDetails.motherName}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Siblings:</b>{" "}
+                        {selectedProfile.familyDetails.siblings}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Family Status:</b>{" "}
+                        {selectedProfile.familyDetails.familyStatus}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Family Profession:</b>{" "}
+                        {selectedProfile.familyDetails.familyProfession}
+                      </Grid>
                     </Grid>
                   ) : (
-                    <Typography color="text.secondary">No family details provided.</Typography>
+                    <Typography color="text.secondary">
+                      No family details provided.
+                    </Typography>
                   )}
                 </Box>
-                <Box sx={{ bgcolor: '#f8f9fa', p: 2, borderRadius: 1 }}>
-                  <Typography variant="subtitle1" fontWeight={600} color="primary" mb={1}>Preferences</Typography>
+                <Box sx={{ bgcolor: "#f8f9fa", p: 2, borderRadius: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    color="primary"
+                    mb={1}
+                  >
+                    Preferences
+                  </Typography>
                   {selectedProfile.preferences ? (
                     <Grid container spacing={1}>
-                      <Grid item xs={6}><b>Age Range:</b> {selectedProfile.preferences.ageRange ? `${selectedProfile.preferences.ageRange.min} - ${selectedProfile.preferences.ageRange.max}` : '-'}</Grid>
-                      <Grid item xs={6}><b>Marital Status:</b> {selectedProfile.preferences.maritalStatus?.join(', ')}</Grid>
-                      <Grid item xs={6}><b>Height Preference:</b> {selectedProfile.preferences.heightPreference}</Grid>
-                      <Grid item xs={6}><b>City Preference:</b> {selectedProfile.preferences.cityPreference}</Grid>
-                      <Grid item xs={6}><b>Religion Preference:</b> {selectedProfile.preferences.religionPreference}</Grid>
+                      <Grid item xs={6}>
+                        <b>Age Range:</b>{" "}
+                        {selectedProfile.preferences.ageRange
+                          ? `${selectedProfile.preferences.ageRange.min} - ${selectedProfile.preferences.ageRange.max}`
+                          : "-"}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Marital Status:</b>{" "}
+                        {selectedProfile.preferences.maritalStatus?.join(", ")}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Height Preference:</b>{" "}
+                        {selectedProfile.preferences.heightPreference}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>City Preference:</b>{" "}
+                        {selectedProfile.preferences.cityPreference}
+                      </Grid>
+                      <Grid item xs={6}>
+                        <b>Religion Preference:</b>{" "}
+                        {selectedProfile.preferences.religionPreference}
+                      </Grid>
                     </Grid>
                   ) : (
-                    <Typography color="text.secondary">No preferences provided.</Typography>
+                    <Typography color="text.secondary">
+                      No preferences provided.
+                    </Typography>
                   )}
                 </Box>
               </Grid>
@@ -545,7 +729,7 @@ const AdminMarriageProfiles: React.FC = () => {
             color="success"
             startIcon={<CheckIcon />}
             onClick={() => handleApprove(selectedProfile._id)}
-            disabled={selectedProfile?.status === 'approved' || loading}
+            disabled={selectedProfile?.status === "approved" || loading}
           >
             Approve
           </Button>
@@ -554,17 +738,15 @@ const AdminMarriageProfiles: React.FC = () => {
             color="error"
             startIcon={<CloseIcon />}
             onClick={() => handleReject(selectedProfile._id)}
-            disabled={selectedProfile?.status === 'rejected' || loading}
+            disabled={selectedProfile?.status === "rejected" || loading}
           >
             Reject
           </Button>
-          <Button onClick={() => setDetailsDialogOpen(false)}>
-            Close
-          </Button>
+          <Button onClick={() => setDetailsDialogOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
 };
 
-export default AdminMarriageProfiles; 
+export default AdminMarriageProfiles;
