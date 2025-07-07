@@ -28,6 +28,10 @@ import AdminJobApplications from "./pages/admin/JobApplications";
 import AdminScholarships from "./pages/admin/Scholarships";
 import AdminMarriageProfiles from "./pages/admin/MarriageProfiles";
 import EditJob from "./pages/admin/EditJob";
+import AdminFamilies from "./pages/admin/Families";
+import AdminFamilyMembers from "./pages/admin/FamilyMembers";
+import AdminFamilyAnalytics from "./pages/admin/FamilyAnalytics";
+import AdminFamilySearch from "./pages/admin/FamilySearch";
 
 const queryClient = new QueryClient();
 
@@ -182,6 +186,39 @@ function App() {
           element: (
             <ProtectedRoute>
               <EditJob />
+            </ProtectedRoute>
+          ),
+        },
+        // Admin Family Management Routes
+        {
+          path: "/admin/families",
+          element: (
+            <ProtectedRoute>
+              <AdminFamilies />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/family-members",
+          element: (
+            <ProtectedRoute>
+              <AdminFamilyMembers />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/family-analytics",
+          element: (
+            <ProtectedRoute>
+              <AdminFamilyAnalytics />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/family-search",
+          element: (
+            <ProtectedRoute>
+              <AdminFamilySearch />
             </ProtectedRoute>
           ),
         },

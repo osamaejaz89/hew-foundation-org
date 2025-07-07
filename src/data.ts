@@ -95,6 +95,37 @@ export const menu = [
         icon: "marriage.svg",
         url: "/admin/marriage-profiles",
       },
+      {
+        id: 4,
+        title: "Family Management",
+        icon: "user.svg",
+        nestedItems: [
+          {
+            id: 1,
+            title: "All Families",
+            url: "/admin/families",
+            icon: "user.svg",
+          },
+          {
+            id: 2,
+            title: "Family Members",
+            url: "/admin/family-members",
+            icon: "user.svg",
+          },
+          {
+            id: 3,
+            title: "Family Analytics",
+            url: "/admin/family-analytics",
+            icon: "chart.svg",
+          },
+          {
+            id: 4,
+            title: "Family Search",
+            url: "/admin/family-search",
+            icon: "search.svg",
+          },
+        ],
+      },
     ],
   },
 ];

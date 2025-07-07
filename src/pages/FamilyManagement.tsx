@@ -40,13 +40,13 @@ const FamilyManagement: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [familiesData, membersData, statsData] = await Promise.all([
+      const [familiesResponse, membersResponse, statsData] = await Promise.all([
         familyService.getAllFamilies(),
         familyService.getAllFamilyMembers(),
         familyService.getFamilyStats(),
       ]);
-      setFamilies(familiesData);
-      setMembers(membersData);
+      setFamilies(familiesResponse.data);
+      setMembers(membersResponse.data);
       setStats(statsData);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -55,14 +55,14 @@ const FamilyManagement: React.FC = () => {
 
   const handleEditClick = (family: Family) => {
     setSelectedFamily(family);
-    setEditForm({ name: family.name, description: family.description });
+    setEditForm({ name: family.name || '', description: family.description || '' });
     setEditDialogOpen(true);
   };
 
   const handleEditSubmit = async () => {
     if (!selectedFamily) return;
     try {
-      await familyService.updateFamily(selectedFamily.code, editForm);
+      await familyService.updateFamily(selectedFamily.familyCode, editForm);
       setEditDialogOpen(false);
       loadData();
     } catch (error) {
@@ -163,7 +163,7 @@ const FamilyManagement: React.FC = () => {
                   <TableBody>
                     {families.map((family) => (
                       <TableRow key={family.id}>
-                        <TableCell>{family.code}</TableCell>
+                        <TableCell>{family.familyCode}</TableCell>
                         <TableCell>{family.name}</TableCell>
                         <TableCell>{family.description}</TableCell>
                         <TableCell>{new Date(family.createdAt).toLocaleDateString()}</TableCell>
@@ -171,7 +171,7 @@ const FamilyManagement: React.FC = () => {
                           <IconButton onClick={() => handleEditClick(family)}>
                             <EditIcon />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteFamily(family.code)}>
+                          <IconButton onClick={() => handleDeleteFamily(family.familyCode)}>
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
@@ -223,7 +223,7 @@ const FamilyManagement: React.FC = () => {
                             size="small"
                             onClick={() =>
                               handleUpdateMemberStatus(
-                                member.id,
+                                member.id || member._id || '',
                                 member.status === 'active' ? 'inactive' : 'active'
                               )
                             }

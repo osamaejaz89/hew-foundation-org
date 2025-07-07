@@ -1,5 +1,19 @@
 import apiClient from "./apiClient";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { 
+  Family, 
+  FamilyMember, 
+  FamilyStats, 
+  FamilyAnalytics,
+  FamilyFilters,
+  MemberFilters,
+  UpdateFamilyPayload,
+  UpdateFamilyMemberPayload,
+  UpdateMemberStatusPayload,
+  BulkUpdatePayload,
+  ExportOptions,
+  FamiliesApiResponse
+} from '../types/family';
 
 // Types
 export interface JobFilters {
@@ -489,4 +503,218 @@ export const searchMarriageProfiles = async (
   return apiClient.get(
     `/api/admin/marriage/profiles/search?${params.toString()}`
   );
+};
+
+// ===== FAMILY MANAGEMENT APIs =====
+
+// Get all families with pagination and sorting
+export const getAllFamilies = async (filters?: FamilyFilters): Promise<{
+  data: Family[];
+  total: number;
+  page: number;
+  limit: number;
+}> => {
+  try {
+    const response = await apiClient.get('/api/admin/families', { params: filters });
+    const apiResponse: FamiliesApiResponse = response.data;
+    
+    return {
+      data: apiResponse.families,
+      total: apiResponse.pagination.total,
+      page: apiResponse.pagination.page,
+      limit: apiResponse.pagination.limit
+    };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get all families with statistics included
+export const getAllFamiliesWithStats = async (filters?: FamilyFilters): Promise<{
+  data: Family[];
+  total: number;
+  page: number;
+  limit: number;
+}> => {
+  try {
+    const response = await apiClient.get('/api/admin/families/with-stats', { params: filters });
+    const apiResponse: FamiliesApiResponse = response.data;
+    
+    return {
+      data: apiResponse.families,
+      total: apiResponse.pagination.total,
+      page: apiResponse.pagination.page,
+      limit: apiResponse.pagination.limit
+    };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Search families with advanced filters
+export const searchFamilies = async (filters: {
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{ data: Family[]; total: number; page: number; limit: number }> => {
+  try {
+    const response = await apiClient.get('/api/admin/families/search', { params: filters });
+    const apiResponse: FamiliesApiResponse = response.data;
+    
+    return {
+      data: apiResponse.families,
+      total: apiResponse.pagination.total,
+      page: apiResponse.pagination.page,
+      limit: apiResponse.pagination.limit
+    };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get family details by family code
+export const getFamilyByCode = async (familyCode: string): Promise<Family> => {
+  try {
+    const response = await apiClient.get(`/api/admin/families/code/${familyCode}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get family details by user ID
+export const getFamilyByUserId = async (userId: string): Promise<Family> => {
+  try {
+    const response = await apiClient.get(`/api/admin/families/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Update family details
+export const updateFamily = async (familyCode: string, payload: UpdateFamilyPayload): Promise<Family> => {
+  try {
+    const response = await apiClient.put(`/api/admin/families/${familyCode}`, payload);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Delete family and all its members
+export const deleteFamily = async (familyCode: string): Promise<void> => {
+  try {
+    await apiClient.delete(`/api/admin/families/${familyCode}`);
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Bulk update multiple families
+export const bulkUpdateFamilies = async (payload: BulkUpdatePayload): Promise<{ updated: number; failed: number }> => {
+  try {
+    const response = await apiClient.put('/api/admin/families/bulk/update', payload);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Export family data in JSON or CSV format
+export const exportFamilyData = async (options: ExportOptions): Promise<Blob> => {
+  try {
+    const response = await apiClient.get('/api/admin/families/export', { 
+      params: options,
+      responseType: 'blob'
+    });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get all family members with filters
+export const getAllFamilyMembers = async (filters?: MemberFilters): Promise<{
+  data: FamilyMember[];
+  total: number;
+  page: number;
+  limit: number;
+}> => {
+  try {
+    const response = await apiClient.get('/api/admin/families/members', { params: filters });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get all members of a specific family by family code
+export const getFamilyMembersByCode = async (familyCode: string): Promise<FamilyMember[]> => {
+  try {
+    const response = await apiClient.get(`/api/admin/families/members/family/${familyCode}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get specific family member details by ID (Admin)
+export const getFamilyMemberById = async (memberId: string): Promise<FamilyMember> => {
+  try {
+    const response = await apiClient.get(`/api/admin/families/members/${memberId}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Update family member details (Admin)
+export const updateFamilyMemberAdmin = async (memberId: string, payload: UpdateFamilyMemberPayload): Promise<FamilyMember> => {
+  try {
+    const response = await apiClient.put(`/api/admin/families/members/${memberId}`, payload);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Delete a family member (Admin)
+export const deleteFamilyMemberAdmin = async (memberId: string): Promise<void> => {
+  try {
+    await apiClient.delete(`/api/admin/families/members/${memberId}`);
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Update member status (temporary/permanent)
+export const updateMemberStatus = async (memberId: string, payload: UpdateMemberStatusPayload): Promise<FamilyMember> => {
+  try {
+    const response = await apiClient.patch(`/api/admin/families/members/${memberId}/status`, payload);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get overall family statistics
+export const getFamilyStats = async (): Promise<FamilyStats> => {
+  try {
+    const response = await apiClient.get('/api/admin/families/stats');
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+// Get detailed family analytics and growth data
+export const getFamilyAnalytics = async (period?: string): Promise<FamilyAnalytics> => {
+  try {
+    const params = period ? { period } : {};
+    const response = await apiClient.get('/api/admin/families/analytics', { params });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
