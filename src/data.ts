@@ -52,6 +52,80 @@ export const menu = [
         url: "/donations",
         icon: "payments.svg",
       },
+      {
+        id: 4,
+        title: "Family Management",
+        url: "/families",
+        icon: "user.svg",
+      },
+    ],
+  },
+  {
+    id: 3,
+    title: "admin",
+    listItems: [
+      {
+        id: 1,
+        title: "Jobs",
+        icon: "job.svg",
+        nestedItems: [
+          {
+            id: 1,
+            title: "All Jobs",
+            url: "/jobs",
+            icon: "list.svg",
+          },
+          {
+            id: 2,
+            title: "Job Applications",
+            url: "/admin/job-applications",
+            icon: "application.svg",
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: "Scholarships",
+        icon: "scholarship.svg",
+        url: "/admin/scholarships",
+      },
+      {
+        id: 3,
+        title: "Marriage Profiles",
+        icon: "marriage.svg",
+        url: "/admin/marriage-profiles",
+      },
+      {
+        id: 4,
+        title: "Family Management",
+        icon: "user.svg",
+        nestedItems: [
+          {
+            id: 1,
+            title: "All Families",
+            url: "/admin/families",
+            icon: "user.svg",
+          },
+          {
+            id: 2,
+            title: "Family Members",
+            url: "/admin/family-members",
+            icon: "user.svg",
+          },
+          {
+            id: 3,
+            title: "Family Analytics",
+            url: "/admin/family-analytics",
+            icon: "chart.svg",
+          },
+          {
+            id: 4,
+            title: "Family Search",
+            url: "/admin/family-search",
+            icon: "search.svg",
+          },
+        ],
+      },
     ],
   },
 ];
