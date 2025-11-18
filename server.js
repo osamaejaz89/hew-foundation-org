@@ -8,12 +8,35 @@ const PORT = process.env.PORT || 4000
 // Enable gzip compression
 app.use(compression())
 
+// Validate URL before static middleware to prevent URIError
+app.use((req, res, next) => {
+  try {
+    // Try to decode the URL to check if it's valid
+    decodeURIComponent(req.url)
+    next()
+  } catch (err) {
+    // If URL is malformed, skip static middleware and go to client-side routing
+    return res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+  }
+})
+
 // Serve static files from dist directory
 app.use(express.static(path.join(__dirname, 'dist')))
 
 // Handle client-side routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
+
+// Error handling middleware (must be after all routes)
+app.use((err, req, res, next) => {
+  if (err instanceof URIError) {
+    // Handle malformed URL - serve index.html for client-side routing
+    return res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+  }
+  // For other errors, send 500
+  console.error('Server error:', err)
+  res.status(500).send('Internal Server Error')
 })
 
 app.listen(PORT, () => {
