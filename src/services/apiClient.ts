@@ -1,7 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 
-// const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-const baseURL = 'http://localhost:3000';
+// Base URL must be [ip]:[port]/api so paths are /admin/families, /user/login, etc. (no /api in path)
+const raw = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/?$/, '');
+const baseURL = raw.endsWith('/api') ? raw : `${raw}/api`;
 
 const apiClient: AxiosInstance = axios.create({
   baseURL,

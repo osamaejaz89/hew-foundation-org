@@ -8,7 +8,7 @@ const TopUsers = () => {
 
   return (
     <div className="top-users">
-      <h2>Top Users</h2>
+      <h2>Recent Users</h2>
       <div className="list">
         {topUsers.map((user) => (
           <div className="list-item" key={user._id}>

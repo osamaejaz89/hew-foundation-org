@@ -10,6 +10,7 @@ type Props = {
   number: number | string;
   percentage: number;
   chartData: object[];
+  to?: string;
 };
 
 const ChartBox = (props: Props) => {
@@ -21,7 +22,7 @@ const ChartBox = (props: Props) => {
           <span>{props.title}</span>
         </div>
         <h1>{props.number}</h1>
-        <Link to="/" style={{ color: props.color }}>
+        <Link to={props.to ?? "/"} style={{ color: props.color }}>
           View all
         </Link>
       </div>
