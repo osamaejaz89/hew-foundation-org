@@ -168,11 +168,11 @@ export const getJobs = async (filters: JobFilters) => {
       params.append(key, value.toString());
     }
   });
-  return apiClient.get(`/api/jobs?${params.toString()}`);
+  return apiClient.get(`/jobs?${params.toString()}`);
 };
 
 export const getJobStatistics = async () => {
-  return apiClient.get("/api/admin/jobs/statistics");
+  return apiClient.get("/admin/jobs/statistics");
 };
 
 export const updateJobStatus = async (
@@ -180,7 +180,7 @@ export const updateJobStatus = async (
   status: string,
   rejectionReason?: string
 ) => {
-  const response = await apiClient.patch(`/api/admin/jobs/${jobId}/status`, {
+  const response = await apiClient.patch(`/admin/jobs/${jobId}/status`, {
     status,
     rejectionReason,
   });
@@ -191,20 +191,20 @@ export const toggleJobFeature = async (
   jobId: string,
   data: { isFeatured: boolean }
 ) => {
-  return apiClient.patch(`/api/jobs/${jobId}/feature`, data);
+  return apiClient.patch(`/jobs/${jobId}/feature`, data);
 };
 
 export const createJob = async (jobData: any) => {
-  const response = await apiClient.post("/api/jobs", jobData);
+  const response = await apiClient.post("/jobs", jobData);
   return response.data;
 };
 
 export const updateJob = async (jobId: string, jobData: any) => {
-  return apiClient.put(`/api/jobs/${jobId}`, jobData);
+  return apiClient.put(`/jobs/${jobId}`, jobData);
 };
 
 export const getJobById = async (jobId: string) => {
-  return apiClient.get(`/api/jobs/${jobId}`);
+  return apiClient.get(`/jobs/${jobId}`);
 };
 
 // Job Applications
@@ -280,16 +280,16 @@ export interface ApiError {
   code?: string;
 }
 
-// Constants
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_BASE_URL = "http://localhost:3000/api";
+// Base URL = [ip]:[port]/api (same as apiClient)
+const raw = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/?$/, "");
+const API_BASE_URL = raw.endsWith("/api") ? raw : `${raw}/api`;
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE = 1;
 
 // Utility functions
 const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("authToken");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -363,7 +363,7 @@ export const getJobApplications = async (
 };
 
 export const getJobApplicationStatistics = async () => {
-  return apiClient.get("/api/admin/job-applications/statistics");
+  return apiClient.get("/admin/job-applications/statistics");
 };
 
 export const getJobApplicationDetails = async (
@@ -431,14 +431,14 @@ export interface ScholarshipData {
 }
 
 export const createScholarship = async (data: ScholarshipData) => {
-  return apiClient.post("/api/admin/scholarships", data);
+  return apiClient.post("/admin/scholarships", data);
 };
 
 export const updateScholarship = async (
   id: string,
   data: Partial<ScholarshipData>
 ) => {
-  return apiClient.patch(`/api/admin/scholarships/${id}`, data);
+  return apiClient.patch(`/admin/scholarships/${id}`, data);
 };
 
 export const getScholarshipApplications = async (
@@ -451,7 +451,7 @@ export const getScholarshipApplications = async (
     }
   });
   return apiClient.get(
-    `/api/admin/scholarships/applications?${params.toString()}`
+    `/admin/scholarships/applications?${params.toString()}`
   );
 };
 
@@ -460,13 +460,13 @@ export const updateScholarshipApplicationStatus = async (
   data: { status: string }
 ) => {
   return apiClient.patch(
-    `/api/admin/scholarships/applications/${id}/status`,
+    `/admin/scholarships/applications/${id}/status`,
     data
   );
 };
 
 export const getScholarshipStatistics = async () => {
-  return apiClient.get("/api/admin/scholarships/stats/detailed");
+  return apiClient.get("/admin/scholarships/stats/detailed");
 };
 
 // Marriage Profiles
@@ -477,18 +477,18 @@ export const getMarriageProfiles = async (filters: MarriageProfileFilters) => {
       params.append(key, value.toString());
     }
   });
-  return apiClient.get(`/api/admin/marriage/profiles?${params.toString()}`);
+  return apiClient.get(`/admin/marriage/profiles?${params.toString()}`);
 };
 
 export const getMarriageProfileById = async (id: string) => {
-  return apiClient.get(`/api/admin/marriage/profiles/${id}`);
+  return apiClient.get(`/admin/marriage/profiles/${id}`);
 };
 
 export const updateMarriageProfileStatus = async (
   id: string,
   data: { status: string }
 ) => {
-  return apiClient.patch(`/api/admin/marriage/profiles/${id}/status`, data);
+  return apiClient.patch(`/admin/marriage/profiles/${id}/status`, data);
 };
 
 export const searchMarriageProfiles = async (
@@ -501,7 +501,7 @@ export const searchMarriageProfiles = async (
     }
   });
   return apiClient.get(
-    `/api/admin/marriage/profiles/search?${params.toString()}`
+    `/admin/marriage/profiles/search?${params.toString()}`
   );
 };
 
@@ -515,7 +515,7 @@ export const getAllFamilies = async (filters?: FamilyFilters): Promise<{
   limit: number;
 }> => {
   try {
-    const response = await apiClient.get('/api/admin/families', { params: filters });
+    const response = await apiClient.get('/admin/families', { params: filters });
     const apiResponse: FamiliesApiResponse = response.data;
     
     return {
@@ -537,7 +537,7 @@ export const getAllFamiliesWithStats = async (filters?: FamilyFilters): Promise<
   limit: number;
 }> => {
   try {
-    const response = await apiClient.get('/api/admin/families/with-stats', { params: filters });
+    const response = await apiClient.get('/admin/families/with-stats', { params: filters });
     const apiResponse: FamiliesApiResponse = response.data;
     
     return {
@@ -558,7 +558,7 @@ export const searchFamilies = async (filters: {
   limit?: number;
 }): Promise<{ data: Family[]; total: number; page: number; limit: number }> => {
   try {
-    const response = await apiClient.get('/api/admin/families/search', { params: filters });
+    const response = await apiClient.get('/admin/families/search', { params: filters });
     const apiResponse: FamiliesApiResponse = response.data;
     
     return {
@@ -575,7 +575,7 @@ export const searchFamilies = async (filters: {
 // Get family details by family code
 export const getFamilyByCode = async (familyCode: string): Promise<Family> => {
   try {
-    const response = await apiClient.get(`/api/admin/families/code/${familyCode}`);
+    const response = await apiClient.get(`/admin/families/code/${familyCode}`);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -585,7 +585,7 @@ export const getFamilyByCode = async (familyCode: string): Promise<Family> => {
 // Get family details by user ID
 export const getFamilyByUserId = async (userId: string): Promise<Family> => {
   try {
-    const response = await apiClient.get(`/api/admin/families/user/${userId}`);
+    const response = await apiClient.get(`/admin/families/user/${userId}`);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -595,7 +595,7 @@ export const getFamilyByUserId = async (userId: string): Promise<Family> => {
 // Update family details
 export const updateFamily = async (familyCode: string, payload: UpdateFamilyPayload): Promise<Family> => {
   try {
-    const response = await apiClient.put(`/api/admin/families/${familyCode}`, payload);
+    const response = await apiClient.put(`/admin/families/${familyCode}`, payload);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -605,7 +605,7 @@ export const updateFamily = async (familyCode: string, payload: UpdateFamilyPayl
 // Delete family and all its members
 export const deleteFamily = async (familyCode: string): Promise<void> => {
   try {
-    await apiClient.delete(`/api/admin/families/${familyCode}`);
+    await apiClient.delete(`/admin/families/${familyCode}`);
   } catch (error) {
     return handleApiError(error);
   }
@@ -614,7 +614,7 @@ export const deleteFamily = async (familyCode: string): Promise<void> => {
 // Bulk update multiple families
 export const bulkUpdateFamilies = async (payload: BulkUpdatePayload): Promise<{ updated: number; failed: number }> => {
   try {
-    const response = await apiClient.put('/api/admin/families/bulk/update', payload);
+    const response = await apiClient.put('/admin/families/bulk/update', payload);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -624,7 +624,7 @@ export const bulkUpdateFamilies = async (payload: BulkUpdatePayload): Promise<{ 
 // Export family data in JSON or CSV format
 export const exportFamilyData = async (options: ExportOptions): Promise<Blob> => {
   try {
-    const response = await apiClient.get('/api/admin/families/export', { 
+    const response = await apiClient.get('/admin/families/export', { 
       params: options,
       responseType: 'blob'
     });
@@ -642,7 +642,7 @@ export const getAllFamilyMembers = async (filters?: MemberFilters): Promise<{
   limit: number;
 }> => {
   try {
-    const response = await apiClient.get('/api/admin/families/members', { params: filters });
+    const response = await apiClient.get('/admin/families/members', { params: filters });
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -652,7 +652,7 @@ export const getAllFamilyMembers = async (filters?: MemberFilters): Promise<{
 // Get all members of a specific family by family code
 export const getFamilyMembersByCode = async (familyCode: string): Promise<FamilyMember[]> => {
   try {
-    const response = await apiClient.get(`/api/admin/families/members/family/${familyCode}`);
+    const response = await apiClient.get(`/admin/families/members/family/${familyCode}`);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -662,7 +662,7 @@ export const getFamilyMembersByCode = async (familyCode: string): Promise<Family
 // Get specific family member details by ID (Admin)
 export const getFamilyMemberById = async (memberId: string): Promise<FamilyMember> => {
   try {
-    const response = await apiClient.get(`/api/admin/families/members/${memberId}`);
+    const response = await apiClient.get(`/admin/families/members/${memberId}`);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -672,7 +672,7 @@ export const getFamilyMemberById = async (memberId: string): Promise<FamilyMembe
 // Update family member details (Admin)
 export const updateFamilyMemberAdmin = async (memberId: string, payload: UpdateFamilyMemberPayload): Promise<FamilyMember> => {
   try {
-    const response = await apiClient.put(`/api/admin/families/members/${memberId}`, payload);
+    const response = await apiClient.put(`/admin/families/members/${memberId}`, payload);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -682,7 +682,7 @@ export const updateFamilyMemberAdmin = async (memberId: string, payload: UpdateF
 // Delete a family member (Admin)
 export const deleteFamilyMemberAdmin = async (memberId: string): Promise<void> => {
   try {
-    await apiClient.delete(`/api/admin/families/members/${memberId}`);
+    await apiClient.delete(`/admin/families/members/${memberId}`);
   } catch (error) {
     return handleApiError(error);
   }
@@ -691,7 +691,7 @@ export const deleteFamilyMemberAdmin = async (memberId: string): Promise<void> =
 // Update member status (temporary/permanent)
 export const updateMemberStatus = async (memberId: string, payload: UpdateMemberStatusPayload): Promise<FamilyMember> => {
   try {
-    const response = await apiClient.patch(`/api/admin/families/members/${memberId}/status`, payload);
+    const response = await apiClient.patch(`/admin/families/members/${memberId}/status`, payload);
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -701,7 +701,7 @@ export const updateMemberStatus = async (memberId: string, payload: UpdateMember
 // Get overall family statistics
 export const getFamilyStats = async (): Promise<FamilyStats> => {
   try {
-    const response = await apiClient.get('/api/admin/families/stats');
+    const response = await apiClient.get('/admin/families/stats');
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -712,7 +712,7 @@ export const getFamilyStats = async (): Promise<FamilyStats> => {
 export const getFamilyAnalytics = async (period?: string): Promise<FamilyAnalytics> => {
   try {
     const params = period ? { period } : {};
-    const response = await apiClient.get('/api/admin/families/analytics', { params });
+    const response = await apiClient.get('/admin/families/analytics', { params });
     return response.data;
   } catch (error) {
     return handleApiError(error);

@@ -23,29 +23,34 @@ a {
 }
 
 .menuContainer {
-  width: 250px;
-  padding: 5px 20px;
-  border-right: 1px solid rgba(255, 255, 255, 0.02);
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  width: 260px;
+  min-width: 260px;
+  padding: 1rem 0.75rem;
+  background: rgba(0, 0, 0, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
+  flex-shrink: 0;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     right: 0;
     height: 100%;
     width: 1px;
-    background: linear-gradient(to bottom, 
-      rgba(255, 255, 255, 0.005),
-      rgba(255, 255, 255, 0.02) 20%,
-      rgba(255, 255, 255, 0.02) 80%,
-      rgba(255, 255, 255, 0.005)
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(255, 255, 255, 0.04) 15%,
+      rgba(255, 255, 255, 0.04) 85%,
+      transparent
     );
+    pointer-events: none;
   }
 
   @include r.lg {
     width: max-content;
+    min-width: auto;
   }
 }
 

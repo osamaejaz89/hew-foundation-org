@@ -7,8 +7,8 @@ import {
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { env } from '../config/env.config';
 
-// Get the base API URL from environment variables
-const BASE_URL = env.API_URL;
+// Base for API calls: [ip]:[port]/api (paths like /user/login, /admin/families)
+const BASE_URL = env.API_BASE_URL;
 
 // Utility to handle the API request
 export const apiRequest = async <T>(

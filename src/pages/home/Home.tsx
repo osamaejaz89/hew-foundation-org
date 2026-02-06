@@ -1,33 +1,49 @@
-import BarChartBox from "../../components/barChartBox/BarChartBox";
-import BigChartBox from "../../components/bigChartBox/BigChartBox";
 import ChartBox from "../../components/chartBox/ChartBox";
-import PieChartBox from "../../components/pieCartBox/PieChartBox";
 import TopUsers from "../../components/topUsers/TopUsers";
-import {
-  barChartBoxRevenue,
-  barChartBoxVisit,
-  chartBoxConversion,
-  chartBoxProduct,
-  chartBoxRevenue,
-} from "../../data";
 import "./home.scss";
 import { useUserApi } from "../../hooks/useUserApi";
+import { useDonations } from "../../pages/donations/useDonationApi";
 
 const Home = () => {
   const { getUsers } = useUserApi();
+  const { data: donations = [] } = useDonations();
   const users = getUsers.data?.data || [];
 
-  const userChartBox = {
+  const totalUsersBox = {
     number: users.length.toString(),
-    percentage: 15,
-    color: "skyblue",
+    percentage: 0,
+    color: "#3b82f6",
     icon: "/userIcon.svg",
     title: "Total Users",
     dataKey: "users",
+    to: "/users",
     chartData: [
-      { name: "Sun", users: 400 },
-      { name: "Mon", users: 600 },
-      // ... other data
+      { name: "Sun", users: 0 },
+      { name: "Mon", users: 0 },
+      { name: "Tue", users: 0 },
+      { name: "Wed", users: 0 },
+      { name: "Thu", users: 0 },
+      { name: "Fri", users: 0 },
+      { name: "Sat", users: 0 },
+    ],
+  };
+
+  const totalDonationsBox = {
+    number: donations.length.toString(),
+    percentage: 0,
+    color: "#10b981",
+    icon: "/userIcon.svg",
+    title: "Total Donations",
+    dataKey: "count",
+    to: "/donations",
+    chartData: [
+      { name: "Sun", count: 0 },
+      { name: "Mon", count: 0 },
+      { name: "Tue", count: 0 },
+      { name: "Wed", count: 0 },
+      { name: "Thu", count: 0 },
+      { name: "Fri", count: 0 },
+      { name: "Sat", count: 0 },
     ],
   };
 
@@ -37,28 +53,10 @@ const Home = () => {
         <TopUsers />
       </div>
       <div className="box box2">
-        <ChartBox {...userChartBox} />
+        <ChartBox {...totalUsersBox} />
       </div>
       <div className="box box3">
-        <ChartBox {...chartBoxProduct} />
-      </div>
-      <div className="box box4">
-        <PieChartBox />
-      </div>
-      <div className="box box5">
-        <ChartBox {...chartBoxConversion} />
-      </div>
-      <div className="box box6">
-        <ChartBox {...chartBoxRevenue} />
-      </div>
-      <div className="box box7">
-        <BigChartBox />
-      </div>
-      <div className="box box8">
-        <BarChartBox {...barChartBoxVisit} />
-      </div>
-      <div className="box box9">
-        <BarChartBox {...barChartBoxRevenue} />
+        <ChartBox {...totalDonationsBox} />
       </div>
     </div>
   );

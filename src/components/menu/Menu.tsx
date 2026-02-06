@@ -1,92 +1,138 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import BloodtypeIcon from "@mui/icons-material/Bloodtype";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import GroupIcon from "@mui/icons-material/Group";
+import HomeIcon from "@mui/icons-material/Home";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import ListIcon from "@mui/icons-material/List";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import SchoolIcon from "@mui/icons-material/School";
+import SearchIcon from "@mui/icons-material/Search";
+import WorkIcon from "@mui/icons-material/Work";
+import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { menu } from "../../data";
 import "./menu.scss";
 
+const MENU_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  home: HomeIcon,
+  group: GroupIcon,
+  bloodtype: BloodtypeIcon,
+  payments: PaymentsIcon,
+  work: WorkIcon,
+  list: ListIcon,
+  assignment: AssignmentIcon,
+  school: SchoolIcon,
+  favorite: FavoriteIcon,
+  familyRestroom: FamilyRestroomIcon,
+  barChart: BarChartIcon,
+  search: SearchIcon,
+};
+
+const MenuIcon = ({ name }: { name: string }) => {
+  const Icon = MENU_ICONS[name] ?? GroupIcon;
+  return <Icon className="menu__icon" />;
+};
+
 const Menu = () => {
   const location = useLocation();
-  const [openDropdowns, setOpenDropdowns] = useState<{ [key: number]: boolean }>({});
+  const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
 
-  // Helper function to check if a dropdown should be active
-  const isDropdownActive = (listItem: any) => {
+  const isDropdownActive = (listItem: { nestedItems?: { url: string }[] }) => {
     if (!listItem.nestedItems) return false;
-    
-    // Check if any nested item's path matches current location
     return listItem.nestedItems.some(
-      (nestedItem: any) => location.pathname === nestedItem.url
+      (nestedItem) => location.pathname === nestedItem.url
     );
   };
 
-  const toggleDropdown = (id: number) => {
-    setOpenDropdowns(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+  const dropdownKey = (sectionId: number, itemId: number) => `${sectionId}-${itemId}`;
+
+  const toggleDropdown = (key: string) => {
+    setOpenDropdowns((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const getIconPath = (iconName: string) => {
-    return `/${iconName}`;
-  };
+  const allListItems = menu.flatMap((section) =>
+    section.listItems.map((listItem) => ({ ...listItem, _sectionId: section.id }))
+  );
 
   return (
-    <div className="menu">
-      {menu.map((item) => (
-        <div className="item" key={item.id}>
-          <span className="title">{item.title}</span>
-          <div className="list-container">
-            {item.listItems.map((listItem) => (
-              <div key={listItem.id}>
+    <nav className="menu" aria-label="Main navigation">
+      <ul className="menu__list" role="list">
+        {allListItems.map((listItem) => (
+          <li key={`${listItem._sectionId}-${listItem.id}`} className="menu__list-item">
                 {listItem.nestedItems ? (
                   <>
-                    <div 
-                      className={`listItem dropdown-header ${
-                        isDropdownActive(listItem) ? "active" : ""
+                    <button
+                      type="button"
+                      className={`menu__link menu__link--dropdown ${
+                        isDropdownActive(listItem) ? "menu__link--active" : ""
                       }`}
-                      onClick={() => toggleDropdown(listItem.id)}
+                      onClick={() => toggleDropdown(dropdownKey(listItem._sectionId, listItem.id))}
+                      aria-expanded={openDropdowns[dropdownKey(listItem._sectionId, listItem.id)] ?? false}
+                      aria-controls={`menu-sub-${listItem._sectionId}-${listItem.id}`}
+                      id={`menu-btn-${listItem._sectionId}-${listItem.id}`}
                     >
-                      <div className="left-content">
-                        <img src={getIconPath(listItem.icon)} alt="" />
+                      <span className="menu__link-inner">
+                        <MenuIcon name={listItem.icon} />
                         <span>{listItem.title}</span>
-                      </div>
-                      {openDropdowns[listItem.id] ? 
-                        <KeyboardArrowUpIcon className="arrow-icon" /> : 
-                        <KeyboardArrowDownIcon className="arrow-icon" />
-                      }
-                    </div>
-                    <div className={`nested-items ${openDropdowns[listItem.id] ? 'open' : ''}`}>
+                      </span>
+                      {openDropdowns[dropdownKey(listItem._sectionId, listItem.id)] ? (
+                        <KeyboardArrowUpIcon className="menu__arrow" aria-hidden />
+                      ) : (
+                        <KeyboardArrowDownIcon className="menu__arrow" aria-hidden />
+                      )}
+                    </button>
+                    <ul
+                      id={`menu-sub-${listItem._sectionId}-${listItem.id}`}
+                      className={`menu__nested ${openDropdowns[dropdownKey(listItem._sectionId, listItem.id)] ? "menu__nested--open" : ""}`}
+                      role="list"
+                      aria-labelledby={`menu-btn-${listItem._sectionId}-${listItem.id}`}
+                    >
                       {listItem.nestedItems.map((nestedItem) => (
-                        <Link
-                          key={nestedItem.id}
-                          to={nestedItem.url}
-                          className={`listItem ${
-                            location.pathname === nestedItem.url ? "active" : ""
-                          }`}
-                        >
-                          <img src={getIconPath(nestedItem.icon)} alt="" />
-                          <span>{nestedItem.title}</span>
-                        </Link>
+                        <li key={nestedItem.id}>
+                          <Link
+                            to={nestedItem.url}
+                            className={`menu__link menu__link--nested ${
+                              location.pathname === nestedItem.url
+                                ? "menu__link--active"
+                                : ""
+                            }`}
+                            aria-current={
+                              location.pathname === nestedItem.url
+                                ? "page"
+                                : undefined
+                            }
+                          >
+                            <MenuIcon name={nestedItem.icon} />
+                            <span>{nestedItem.title}</span>
+                          </Link>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </>
                 ) : (
                   <Link
                     to={listItem.url || "#"}
-                    className={`listItem ${
-                      location.pathname === listItem.url ? "active" : ""
+                    className={`menu__link ${
+                      location.pathname === listItem.url
+                        ? "menu__link--active"
+                        : ""
                     }`}
+                    aria-current={
+                      location.pathname === listItem.url ? "page" : undefined
+                    }
                   >
-                    <img src={getIconPath(listItem.icon)} alt="" />
+                    <MenuIcon name={listItem.icon} />
                     <span>{listItem.title}</span>
                   </Link>
                 )}
-              </div>
+              </li>
             ))}
-          </div>
-        </div>
-      ))}
-    </div>
+      </ul>
+    </nav>
   );
 };
 

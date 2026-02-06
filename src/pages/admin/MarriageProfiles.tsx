@@ -40,8 +40,16 @@ import SearchIcon from "@mui/icons-material/Search";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import DataTable from "../../components/dataTable/DataTable";
 import { GridColDef } from "@mui/x-data-grid";
+import { env } from "../../config/env.config";
 
 const DEFAULT_AVATAR = "/public/noavatar.png";
+
+const getProfileImageUrl = (profilePicture: string | undefined): string => {
+  if (!profilePicture) return DEFAULT_AVATAR;
+  if (profilePicture.startsWith("http://") || profilePicture.startsWith("https://")) return profilePicture;
+  const base = (env.API_URL || "").replace(/\/$/, "");
+  return `${base}/${profilePicture.replace(/^\//, "")}`;
+};
 
 const AdminMarriageProfiles: React.FC = () => {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -185,11 +193,7 @@ const AdminMarriageProfiles: React.FC = () => {
       width: 70,
       renderCell: (params) => (
         <Avatar
-          src={
-            params.row.profilePicture
-              ? `/${params.row.profilePicture}`
-              : DEFAULT_AVATAR
-          }
+          src={getProfileImageUrl(params.row.profilePicture)}
           alt={params.row.fullName}
           sx={{ width: 40, height: 40 }}
         />
@@ -514,7 +518,6 @@ const AdminMarriageProfiles: React.FC = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
-          {console.log("selectedProfile", selectedProfile)}
           {selectedProfile && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
@@ -527,11 +530,7 @@ const AdminMarriageProfiles: React.FC = () => {
                   }}
                 >
                   <Avatar
-                    src={
-                      selectedProfile.profilePicture
-                        ? `/${selectedProfile.profilePicture}`
-                        : DEFAULT_AVATAR
-                    }
+                    src={getProfileImageUrl(selectedProfile.profilePicture)}
                     alt={selectedProfile.fullName}
                     sx={{ width: 100, height: 100, mb: 2 }}
                   />

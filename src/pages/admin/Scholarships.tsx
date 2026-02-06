@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../services/apiClient';
 import {
   Box,
   Card,
@@ -119,16 +119,7 @@ const AdminScholarships: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:3000/api/scholarships',
-        headers: { 
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFraWYuYWJkdWxsYWguYWEzMkBnbWFpbC5jb20iLCJ0eXBlIjoidXNlciIsImlhdCI6MTc0NzgyOTY2NSwiZXhwIjoxNzc5Mzg3MjY1LCJhdWQiOiI2NzZhZWUzNzJiMTc2YWMwYjY0NDc5YzciLCJpc3MiOiJoZXcifQ.nu-SG_Zig7jlh7ERSTKcndr9b_us1Pgtfq7leNmTTTM'
-        }
-      };
-
-      const response = await axios.request<ApiResponse>(config);
+      const response = await apiClient.get<ApiResponse>('/scholarships');
       setScholarships(response.data.scholarships || []);
       
       // For now, we'll keep the applications and statistics as empty arrays/null

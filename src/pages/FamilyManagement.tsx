@@ -26,6 +26,13 @@ import { Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from '
 import { Family, FamilyMember, FamilyStats } from '../types/family';
 import { familyService } from '../services/familyService';
 
+// API may return populated refs as objects; ensure we render a string
+const displayRef = (val: string | { _id?: string; familyCode?: string; name?: string; email?: string } | undefined): string => {
+  if (val == null) return '—';
+  if (typeof val === 'string') return val;
+  return (val as any).familyCode ?? (val as any)._id ?? (val as any).name ?? (val as any).email ?? '—';
+};
+
 const FamilyManagement: React.FC = () => {
   const [families, setFamilies] = useState<Family[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
@@ -45,11 +52,13 @@ const FamilyManagement: React.FC = () => {
         familyService.getAllFamilyMembers(),
         familyService.getFamilyStats(),
       ]);
-      setFamilies(familiesResponse.data);
-      setMembers(membersResponse.data);
-      setStats(statsData);
+      setFamilies(familiesResponse?.data ?? []);
+      setMembers(membersResponse?.data ?? []);
+      setStats(statsData ?? null);
     } catch (error) {
       console.error('Error loading data:', error);
+      setFamilies([]);
+      setMembers([]);
     }
   };
 
@@ -161,11 +170,11 @@ const FamilyManagement: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {families.map((family) => (
-                      <TableRow key={family.id}>
-                        <TableCell>{family.familyCode}</TableCell>
-                        <TableCell>{family.name}</TableCell>
-                        <TableCell>{family.description}</TableCell>
+                    {(families ?? []).map((family) => (
+                      <TableRow key={family.id ?? family._id ?? family.familyCode}>
+                        <TableCell>{family.familyCode ?? displayRef(family as any)}</TableCell>
+                        <TableCell>{typeof family.name === 'string' ? family.name : displayRef(family.userId)}</TableCell>
+                        <TableCell>{typeof family.description === 'string' ? family.description : '—'}</TableCell>
                         <TableCell>{new Date(family.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell>
                           <IconButton onClick={() => handleEditClick(family)}>
@@ -201,11 +210,11 @@ const FamilyManagement: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {members.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell>{member.userId}</TableCell>
-                        <TableCell>{member.familyId}</TableCell>
-                        <TableCell>{member.role}</TableCell>
+                    {(members ?? []).map((member) => (
+                      <TableRow key={member.id ?? member._id}>
+                        <TableCell>{displayRef(member.userId as any)}</TableCell>
+                        <TableCell>{displayRef(member.familyId as any)}</TableCell>
+                        <TableCell>{member.role ?? '—'}</TableCell>
                         <TableCell>
                           <Chip
                             label={member.status}
