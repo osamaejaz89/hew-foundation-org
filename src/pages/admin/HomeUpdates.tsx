@@ -33,7 +33,7 @@ const getImageDisplayUrl = (filename: string): string => {
   const raw = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
   const serverRoot = raw.endsWith("/api") ? raw.replace(/\/api\/?$/, "") : raw;
   const base = serverRoot || (typeof window !== "undefined" ? window.location.origin : "");
-  return `${base}/src/uploads/hewfoundationupdates/${encodeURIComponent(filename)}`;
+  return `${base}/uploads/hewfoundationupdates/${encodeURIComponent(filename)}`;
 };
 
 const HomeUpdates: React.FC = () => {
