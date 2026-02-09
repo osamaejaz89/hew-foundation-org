@@ -28,6 +28,14 @@ import {
 } from "../../services/adminService";
 import { toast } from "react-toastify";
 
+// Build image URL from same origin as API so pictures load in admin (server may return wrong host in url)
+const getImageDisplayUrl = (filename: string): string => {
+  const raw = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const serverRoot = raw.endsWith("/api") ? raw.replace(/\/api\/?$/, "") : raw;
+  const base = serverRoot || (typeof window !== "undefined" ? window.location.origin : "");
+  return `${base}/src/uploads/hewfoundationupdates/${encodeURIComponent(filename)}`;
+};
+
 const HomeUpdates: React.FC = () => {
   const [images, setImages] = useState<HomeUpdateImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -204,7 +212,7 @@ const HomeUpdates: React.FC = () => {
                 <CardMedia
                   component="img"
                   height="180"
-                  image={img.url}
+                  image={getImageDisplayUrl(img.filename)}
                   alt={img.title || img.filename}
                   sx={{ objectFit: "cover" }}
                 />
