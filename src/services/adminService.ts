@@ -718,3 +718,46 @@ export const getFamilyAnalytics = async (period?: string): Promise<FamilyAnalyti
     return handleApiError(error);
   }
 };
+
+// --- Home Updates (App home carousel images) ---
+export interface HomeUpdateImage {
+  id: string;
+  url: string;
+  filename: string;
+  title: string;
+  description: string;
+}
+
+export const getHomeUpdates = async (): Promise<{ images: HomeUpdateImage[] }> => {
+  const response = await apiClient.get('/home-updates');
+  return response.data;
+};
+
+export const uploadHomeUpdate = async (
+  file: File,
+  title: string = '',
+  description: string = ''
+): Promise<{ image: HomeUpdateImage }> => {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('title', title);
+  formData.append('description', description);
+  const response = await apiClient.post('/admin/home-updates', formData);
+  return response.data;
+};
+
+export const updateHomeUpdateMeta = async (
+  filename: string,
+  title: string,
+  description: string
+): Promise<{ image: HomeUpdateImage }> => {
+  const response = await apiClient.patch(`/admin/home-updates/${encodeURIComponent(filename)}`, {
+    title,
+    description,
+  });
+  return response.data;
+};
+
+export const deleteHomeUpdate = async (filename: string): Promise<void> => {
+  await apiClient.delete(`/admin/home-updates/${encodeURIComponent(filename)}`);
+};

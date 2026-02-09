@@ -32,6 +32,7 @@ import AdminFamilies from "./pages/admin/Families";
 import AdminFamilyMembers from "./pages/admin/FamilyMembers";
 import AdminFamilyAnalytics from "./pages/admin/FamilyAnalytics";
 import AdminFamilySearch from "./pages/admin/FamilySearch";
+import HomeUpdates from "./pages/admin/HomeUpdates";
 
 const queryClient = new QueryClient();
 
@@ -219,6 +220,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <AdminFamilySearch />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin/home-updates",
+          element: (
+            <ProtectedRoute>
+              <HomeUpdates />
             </ProtectedRoute>
           ),
         },

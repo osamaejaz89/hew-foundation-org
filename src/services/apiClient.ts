@@ -11,11 +11,14 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Add request interceptor to add auth token
+// Add request interceptor to add auth token and fix FormData uploads
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
   }
   return config;
 });
