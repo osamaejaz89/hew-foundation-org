@@ -15,7 +15,8 @@
     "pm2:delete": "pm2 delete hew-foundation",
     "pm2:logs": "pm2 logs hew-foundation",
     "pm2:monit": "pm2 monit",
-    "deploy": "npm run build && pm2 restart hew-foundation"
+    "deploy": "npm run build && pm2 restart hew-foundation",
+    "refresh": "npm run build && pm2 restart hew-foundation"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

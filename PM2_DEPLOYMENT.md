@@ -1,5 +1,23 @@
 # PM2 Deployment Guide - HEW Foundation
 
+## ⚠️ Changes reflect nahi ho rahi? (Code change ke baad)
+
+**Production (PM2)** pe app `dist/` folder serve karta hai. Koi bhi code change dikhane ke liye:
+
+```bash
+yarn build
+# phir
+yarn pm2:restart
+# ya ek saath
+yarn deploy
+# ya
+yarn refresh
+```
+
+**Development (yarn dev)** pe agar file change detect nahi ho rahi: browser hard refresh karein (Ctrl+Shift+R), ya Vite config mein `usePolling` already enable hai—dev server restart karein.
+
+---
+
 ## 📋 Prerequisites (Pehle Ye Check Karo)
 
 1. **Node.js** installed (version 16+ recommended)

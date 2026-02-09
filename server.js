@@ -21,10 +21,14 @@ app.use((req, res, next) => {
 })
 
 // Serve static files from dist directory
-app.use(express.static(path.join(__dirname, 'dist')))
+app.use(express.static(path.join(__dirname, 'dist'), {
+  maxAge: '1y',
+  etag: true,
+}))
 
-// Handle client-side routing
+// Handle client-side routing (SPA fallback). No-cache so deployments reflect immediately.
 app.get('*', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
