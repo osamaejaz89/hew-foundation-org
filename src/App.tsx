@@ -32,13 +32,12 @@ import AdminFamilies from "./pages/admin/Families";
 import AdminFamilyMembers from "./pages/admin/FamilyMembers";
 import AdminFamilyAnalytics from "./pages/admin/FamilyAnalytics";
 import AdminFamilySearch from "./pages/admin/FamilySearch";
-import HomeUpdates from "./pages/admin/HomeUpdates";
+// import HomeUpdates from "./pages/admin/HomeUpdates";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
-  console.log(isAuthenticated, "authhhh");
+  const [, setIsAuthenticated] = useState(false); // Authentication state
   useEffect(() => {
     // Check for token on initial load
     const token = localStorage.getItem("authToken");
@@ -223,14 +222,15 @@ function App() {
             </ProtectedRoute>
           ),
         },
-        {
-          path: "/admin/home-updates",
-          element: (
-            <ProtectedRoute>
-              <HomeUpdates />
-            </ProtectedRoute>
-          ),
-        },
+        // Home Updates (hidden)
+        // {
+        //   path: "/admin/home-updates",
+        //   element: (
+        //     <ProtectedRoute>
+        //       <HomeUpdates />
+        //     </ProtectedRoute>
+        //   ),
+        // },
       ],
     },
   ]);

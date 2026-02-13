@@ -9,12 +9,13 @@ export const menu = [
         url: "/home",
         icon: "home",
       },
-      {
-        id: 2,
-        title: "Home Updates",
-        url: "/admin/home-updates",
-        icon: "list",
-      },
+      // Home Updates (hidden)
+      // {
+      //   id: 2,
+      //   title: "Home Updates",
+      //   url: "/admin/home-updates",
+      //   icon: "list",
+      // },
     ],
   },
   {
