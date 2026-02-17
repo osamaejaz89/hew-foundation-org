@@ -9,14 +9,14 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "node server.js",
-    "pm2:start": "pm2 start ecosystem.config.js",
-    "pm2:stop": "pm2 stop hew-foundation",
-    "pm2:restart": "pm2 restart hew-foundation",
-    "pm2:delete": "pm2 delete hew-foundation",
-    "pm2:logs": "pm2 logs hew-foundation",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:stop": "pm2 stop hew-foundation-web",
+    "pm2:restart": "pm2 restart hew-foundation-web --env production",
+    "pm2:delete": "pm2 delete hew-foundation-web",
+    "pm2:logs": "pm2 logs hew-foundation-web",
     "pm2:monit": "pm2 monit",
-    "deploy": "npm run build && pm2 restart hew-foundation",
-    "refresh": "npm run build && pm2 restart hew-foundation"
+    "deploy": "npm run build && pm2 restart hew-foundation-web --env production",
+    "refresh": "npm run build && pm2 restart hew-foundation-web --env production"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
