@@ -3,10 +3,9 @@ import { User } from '../types/user';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-// Same as donations: hit API every 15–20 min, no repeated calls in between
-const USERS_REFETCH_MS = 15 * 60 * 1000;
-const USERS_STALE_MS = 15 * 60 * 1000;
-const USERS_CACHE_MS = 20 * 60 * 1000;
+// Manual refresh only — no auto polling (saves bandwidth)
+const USERS_STALE_MS = 5 * 60 * 1000;
+const USERS_CACHE_MS = 15 * 60 * 1000;
 
 interface ApiResponse {
   success: boolean;
@@ -21,7 +20,8 @@ export const useUserApi = () => {
   const queryClient = useQueryClient();
 
   const getUsers = useApiQuery<ApiResponse>('user/list-users', {
-    refetchInterval: USERS_REFETCH_MS,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
     staleTime: USERS_STALE_MS,
     cacheTime: USERS_CACHE_MS,
   });

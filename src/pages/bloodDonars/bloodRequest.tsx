@@ -69,14 +69,13 @@ export default function BloodRequest() {
   //   error,
   // } = getBloodRequest();
   const {
-    data: bloodRequestsData = [] as BloodRequest[], 
+    data: bloodRequestsData = [] as BloodRequest[],
     isLoading,
     isError,
     error,
-  } = getBloodRequest({
-    refetchInterval: 15000, // Poll for updates every 15 seconds
-    refetchOnWindowFocus: true, // Refetch on window focus
-  });
+    refetch,
+    isFetching,
+  } = getBloodRequest();
 
   // console.table("bloodRequestsData", bloodRequestsData);
 
@@ -89,9 +88,12 @@ export default function BloodRequest() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
-        Blood requests
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h4">Blood requests</Typography>
+        <Button variant="outlined" onClick={() => refetch()} disabled={isFetching} size="small">
+          {isFetching ? "Refreshing…" : "Refresh"}
+        </Button>
+      </Box>
 
       {/* Donor Cards Grid */}
       <Grid container spacing={3}>

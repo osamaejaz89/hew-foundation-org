@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import ChartBox from "../../components/chartBox/ChartBox";
 import TopUsers from "../../components/topUsers/TopUsers";
 import "./home.scss";
@@ -6,8 +7,13 @@ import { useDonations } from "../../pages/donations/useDonationApi";
 
 const Home = () => {
   const { getUsers } = useUserApi();
-  const { data: donations = [] } = useDonations();
+  const { data: donations = [], refetch: refetchDonations, isFetching: donationsFetching } = useDonations();
   const users = getUsers.data?.data || [];
+  const isRefreshing = getUsers.isFetching || donationsFetching;
+  const handleRefresh = () => {
+    getUsers.refetch();
+    refetchDonations();
+  };
 
   const totalUsersBox = {
     number: users.length.toString(),
@@ -49,6 +55,11 @@ const Home = () => {
 
   return (
     <div className="home">
+      <div style={{ position: "absolute", top: 12, right: 12 }}>
+        <Button variant="outlined" size="small" onClick={handleRefresh} disabled={isRefreshing}>
+          {isRefreshing ? "Refreshing…" : "Refresh"}
+        </Button>
+      </div>
       <div className="box box1">
         <TopUsers />
       </div>

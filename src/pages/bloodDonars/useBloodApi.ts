@@ -1,13 +1,13 @@
 import { useApiMutationPatch, useApiQuery } from "../../hooks/useApi";
 
-// src/api/bloodDonors.ts
+// Manual refresh only — no auto polling (saves bandwidth)
 export const getBloodDonar = (options = {}) => {
   return useApiQuery<any>("blood/donor-request/", {
-    refetchOnWindowFocus: true, // Refetch data when the user focuses on the tab
-    refetchInterval: 5000, // Poll every 5 seconds
-    staleTime: 1000, // Mark the data as stale after 1 second
-    cacheTime: 300000, // Keep cache data for 5 minutes
-    ...options, // Override default options
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 15 * 60 * 1000,
+    ...options,
   });
 }
 
@@ -27,21 +27,21 @@ export const getBloodDonar = (options = {}) => {
 // };
 export const getBloodRequest = (options = {}) => {
   return useApiQuery<any>("blood-requests/requests", {
-    refetchOnWindowFocus: true, // Refetch data when the user focuses on the tab
-    refetchInterval: 5000, // Poll every 5 seconds
-    staleTime: 1000, // Mark the data as stale after 1 second
-    cacheTime: 300000, // Keep cache data for 5 minutes
-    ...options, // Override default options
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 15 * 60 * 1000,
+    ...options,
   });
 };
 
 export const getAllBloodUsers = (options = {}) => {
   return useApiQuery<any>("blood/blood-users", {
-    refetchOnWindowFocus: true, // Refetch data when the user focuses on the tab
-    refetchInterval: 5000, // Poll every 5 seconds
-    staleTime: 1000, // Mark the data as stale after 1 second
-    cacheTime: 300000, // Keep cache data for 5 minutes
-    ...options, // Override default options
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 15 * 60 * 1000,
+    ...options,
   });
 }
 

@@ -52,12 +52,9 @@ export default function BloodDonorRequest() {
     isLoading,
     isError,
     error,
-  } = getBloodDonar({
-    refetchOnWindowFocus: true,
-    refetchInterval: 15000,
-    staleTime: 1000,
-    cacheTime: 300000,
-  });
+    refetch,
+    isFetching,
+  } = getBloodDonar();
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !donarRequestsData)
@@ -68,9 +65,11 @@ export default function BloodDonorRequest() {
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* <Typography variant="h4" gutterBottom>
-        Blood Donor Requests
-      </Typography> */}
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button variant="outlined" onClick={() => refetch()} disabled={isFetching} size="small">
+          {isFetching ? "Refreshing…" : "Refresh"}
+        </Button>
+      </Box>
 
       {/* Donor Cards Grid */}
       <Grid container spacing={3}>

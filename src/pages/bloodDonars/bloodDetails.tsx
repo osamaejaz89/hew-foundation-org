@@ -87,12 +87,9 @@ const BloodDetails = () => {
     isLoading,
     isError,
     error,
-  } = getAllBloodUsers({
-    refetchOnWindowFocus: true,
-    refetchInterval: 15000,
-    staleTime: 1000,
-    cacheTime: 300000,
-  });
+    refetch,
+    isFetching,
+  } = getAllBloodUsers();
 
   const [bloodUsersDetails, setBloodUsersDetails] = useState<any[]>([]);
   console.log("bloodUsersDetails===========", bloodUsersDetails);
@@ -143,12 +140,21 @@ const BloodDetails = () => {
     <div className="users">
       <div className="info">
         <h1>Users</h1>
-        <button
-          onClick={() => setOpen(true)}
-          style={{ width: "20%", height: 35 }}
-        >
-          Add New Donor/Request
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            style={{ height: 35, padding: "0 12px" }}
+          >
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </button>
+          <button
+            onClick={() => setOpen(true)}
+            style={{ width: "20%", height: 35 }}
+          >
+            Add New Donor/Request
+          </button>
+        </div>
       </div>
       <DataTable
         slug="bloodDetails"

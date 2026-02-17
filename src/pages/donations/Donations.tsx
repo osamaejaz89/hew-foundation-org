@@ -8,7 +8,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CommentIcon from '@mui/icons-material/Comment';
 import "./donations.scss";
 import { Donation } from "../../types/donation";
-import { Box, IconButton, FormControl, InputLabel, Select, MenuItem, Stack, TextField, SelectChangeEvent, Divider, Tooltip } from "@mui/material";
+import { Box, Button, IconButton, FormControl, InputLabel, Select, MenuItem, Stack, TextField, SelectChangeEvent, Divider, Tooltip } from "@mui/material";
 import RemarksHistoryModal from './RemarksHistoryModal';
 
 // Update the type definition
@@ -30,7 +30,7 @@ const Donations = () => {
         donationInfo: null
     });
 
-    const { data: donations = [], isLoading } = useDonations();
+    const { data: donations = [], isLoading, refetch, isFetching } = useDonations();
     const approveMutation = useApproveDonation(selectedDonation?._id);
 
     // Update the filter logic
@@ -213,6 +213,9 @@ const Donations = () => {
         <div className="donations">
             <div className="info">
                 <h1>Donations Management</h1>
+                <Button variant="outlined" size="small" onClick={() => refetch()} disabled={isFetching}>
+                    {isFetching ? "Refreshing…" : "Refresh"}
+                </Button>
             </div>
 
             {/* Hide the top search if DataTable search is being used */}

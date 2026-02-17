@@ -210,12 +210,21 @@ const Users = () => {
     <div className="users">
       <div className="info">
         <h1>Users</h1>
-        <button
-          onClick={() => setOpen(true)}
-          style={{ width: "15%", height: 30 }}
-        >
-          Add New User
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => getUsers.refetch()}
+            disabled={getUsers.isFetching}
+            style={{ height: 30, padding: "0 12px" }}
+          >
+            {getUsers.isFetching ? "Refreshing…" : "Refresh"}
+          </button>
+          <button
+            onClick={() => setOpen(true)}
+            style={{ width: "15%", height: 30 }}
+          >
+            Add New User
+          </button>
+        </div>
       </div>
       <DataTable
         slug="users"
