@@ -32,8 +32,6 @@ const ReusableModal: React.FC<ModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>(initialData);
 
-  console.log(fields,'fiedlssss');
-
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 

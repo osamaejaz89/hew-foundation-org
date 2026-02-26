@@ -27,7 +27,7 @@ export const useUserApi = () => {
   });
   
   const deleteUser = useApiMutation<ApiResponse>('users', {
-    mutationFn: (id: string) => apiRequest(`users/${id}`, 'DELETE')
+    mutationFn: (id: string) => apiRequest(`user/user/${id}`, 'DELETE')
   });
   
   const addUser = useApiMutation<ApiResponse>('users', {
