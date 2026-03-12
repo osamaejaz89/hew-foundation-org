@@ -233,6 +233,17 @@ function App() {
         // },
       ],
     },
+    // Catch-all: unknown paths show not-found and link to login
+    {
+      path: "*",
+      element: (
+        <div style={{ padding: "2rem", textAlign: "center", fontFamily: "Inter, sans-serif" }}>
+          <h1 style={{ marginBottom: "0.5rem" }}>404</h1>
+          <p style={{ color: "#666", marginBottom: "1rem" }}>Page not found</p>
+          <a href="/login" style={{ color: "#167EE6", textDecoration: "none" }}>Go to Login</a>
+        </div>
+      ),
+    },
   ]);
 
   return (

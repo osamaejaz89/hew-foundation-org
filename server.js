@@ -20,6 +20,14 @@ app.use((req, res, next) => {
   }
 })
 
+// Favicon: many clients request /favicon.ico; serve SVG so no 404 in logs
+app.get('/favicon.ico', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml')
+  res.sendFile(path.join(__dirname, 'dist', 'favicon.svg'), (err) => {
+    if (err) res.status(204).end()
+  })
+})
+
 // Serve static files from dist directory
 app.use(express.static(path.join(__dirname, 'dist'), {
   maxAge: '1y',
